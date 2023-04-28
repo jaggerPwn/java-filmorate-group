@@ -7,8 +7,7 @@
 *.zip
 *.tar.gz
 *.rar
-*.yml
-*.xml
+
 hs_err_pid*
 out/
 target/
