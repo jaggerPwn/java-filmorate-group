@@ -34,7 +34,7 @@ public class UserController {
             Validator.userValidator(newUser);
             return new ResponseEntity<>(userService.updateUser(newUser), HttpStatus.OK);
         } catch (ValidationException e) {
-            return new ResponseEntity<>(newUser, HttpStatus.valueOf(500));
+            return new ResponseEntity<>(newUser, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

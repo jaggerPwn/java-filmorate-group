@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.validation;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -7,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 
 @Slf4j
+@UtilityClass
 public class Validator {
 
     //Для Film:

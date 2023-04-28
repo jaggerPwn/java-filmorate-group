@@ -34,7 +34,7 @@ public class FilmController {
             Validator.filmValidator(newFilm);
             return new ResponseEntity<>(service.updateFilm(newFilm), HttpStatus.OK);
         } catch (ValidationException e) {
-            return new ResponseEntity<>(newFilm, HttpStatus.valueOf(500));
+            return new ResponseEntity<>(newFilm, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
