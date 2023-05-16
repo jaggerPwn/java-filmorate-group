@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserDTO;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.validation.ValidationException;
 import ru.yandex.practicum.filmorate.validation.Validator;
 
 import java.util.ArrayList;
@@ -28,17 +29,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO saveUser(UserDTO userDTO) {
         User user = UserMapper.userToUser(userDTO);
-        Validator.userValidator(user);
-        log.debug("Юзер " + userDTO + " сохранён.");
-        return UserMapper.userToUserDTO(us.saveUser(user));
+        if (Validator.userValidator(user)) {
+            log.debug("Юзер " + userDTO + " сохранён.");
+            return UserMapper.userToUserDTO(us.saveUser(user));
+        }
+        throw new ValidationException("Валидация юзера" + userDTO + " не пройдена");
     }
 
     @Override
     public UserDTO updateUser(UserDTO userDto) {
         User user = UserMapper.userToUser(userDto);
-        Validator.userValidator(user);
-        log.debug("У юзера " + userDto + " обновлён статус");
-        return UserMapper.userToUserDTO(us.updateUser(user));
+        if (Validator.userValidator(user)) {
+            log.debug("У юзера " + userDto + " обновлён статус");
+            return UserMapper.userToUserDTO(us.updateUser(user));
+        }
+        throw new ValidationException("Валидация юзера" + userDto + " не пройдена");
     }
 
     @Override
@@ -85,25 +90,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> readAllCommonFriends(Long idUser1, Long idUser2) {
-//        User user1 = us.getUserById(idUser1);
-//        User user2 = us.getUserById(idUser2);
-//        Set<Long> idFriends1 = user1.getFriends();
-//        Set<Long> idFriends2 = user2.getFriends();
-//        List<Long> idContainsFriends = new ArrayList<>();
-//
-//        for (Long aLong : idFriends1) {
-//            if (idFriends2.contains(aLong)) {
-//                idContainsFriends.add(aLong);
-//            }
-//        }
-//
-//        List <UserDTO> friendsDto = new ArrayList<>();
-//        for (Long friend : idContainsFriends) {
-//            friendsDto.add(UserMapper.userToUserDTO(us.getUserById(friend)));
-//        }
-//
-//        return friendsDto;
-
         Set<Long> ids = new HashSet<>(us.getUserById(idUser1).getFriends());
         ids.retainAll(us.getUserById(idUser2).getFriends());
         log.debug("Возвращён список общих друзей у " + idUser1 + " и " + idUser2);

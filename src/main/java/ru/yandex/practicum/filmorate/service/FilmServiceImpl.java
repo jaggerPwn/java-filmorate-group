@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmDTO;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.validation.ValidationException;
 import ru.yandex.practicum.filmorate.validation.Validator;
 
 import java.util.List;
@@ -28,17 +29,21 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public FilmDTO saveFilm(FilmDTO filmDTO) {
         Film film = FilmMapper.dtoToFilm(filmDTO);
-        Validator.filmValidator(film);
-        log.debug("Фильм " + filmDTO + " сохранён.");
-        return FilmMapper.filmToFilmDTO(fs.saveFilm(film));
+        if (Validator.filmValidator(film)) {
+            log.debug("Фильм " + filmDTO + " сохранён.");
+            return FilmMapper.filmToFilmDTO(fs.saveFilm(film));
+        }
+        throw new ValidationException("Валидация фильма" + filmDTO + " не пройдена");
     }
 
     @Override
     public FilmDTO updateFilm(FilmDTO filmDTO) {
         Film film = FilmMapper.dtoToFilm(filmDTO);
-        Validator.filmValidator(film);
-        log.debug("Фильм " + filmDTO + " обновлён.");
-        return FilmMapper.filmToFilmDTO(fs.updateFilm(film));
+        if (Validator.filmValidator(film)) {
+            log.debug("Фильм " + filmDTO + " обновлён.");
+            return FilmMapper.filmToFilmDTO(fs.updateFilm(film));
+        }
+        throw new ValidationException("Валидация фильма" + filmDTO + " не пройдена");
     }
 
     @Override
