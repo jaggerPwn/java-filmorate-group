@@ -1,14 +1,26 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserDTO;
 
 import java.util.List;
 
 public interface UserService {
 
-    User saveUser(User user);
+    UserDTO saveUser(UserDTO user);
 
-    User updateUser(User user);
+    UserDTO updateUser(UserDTO user);
 
-    List<User> readAllUsers();
+    List<UserDTO> readAllUsers();
+
+    void addFiend(Long userId, Long friendId);
+
+    UserDTO getUserById(Long id);
+
+    void deleteFriendById(Long idUser, Long idFriend);
+
+    List<UserDTO> readAllFriendsByUserId(Long idUser);
+
+    List<UserDTO> readAllCommonFriends(Long idUser1, Long idUser2);
+
+
 }

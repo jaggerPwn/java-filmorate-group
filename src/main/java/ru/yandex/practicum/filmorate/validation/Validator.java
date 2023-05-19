@@ -1,22 +1,24 @@
 package ru.yandex.practicum.filmorate.validation;
 
-import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
 @Slf4j
-@UtilityClass
 public class Validator {
+
+    private Validator() {
+    }
 
     //Для Film:
     //название не может быть пустым;
     //максимальная длина описания — 200 символов;
     //дата релиза — не раньше 28 декабря 1895 года;
     //продолжительность фильма должна быть положительной.
-    public static void filmValidator(Film film) {
+    public static boolean filmValidator(Film film) {
         if (film.getName().isEmpty()) {
             log.debug("Name can not be empty");
             throw new ValidationException("Name can not be empty");
@@ -34,6 +36,7 @@ public class Validator {
             throw new ValidationException("Duration must be positive");
         }
         log.debug("Validation is successful");
+        return true;
     }
 
     //Для User:
@@ -41,7 +44,7 @@ public class Validator {
     //логин не может быть пустым и содержать пробелы;
     //имя для отображения может быть пустым — в таком случае будет использован логин;
     //дата рождения не может быть в будущем.
-    public static void userValidator(User user) {
+    public static boolean userValidator(User user) {
         if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.debug("Email is wrong");
             throw new ValidationException("Email is wrong");
@@ -59,6 +62,7 @@ public class Validator {
             throw new ValidationException("Birthday can`t be in future");
         }
         log.debug("User validation is successful");
+        return true;
     }
 
 }
