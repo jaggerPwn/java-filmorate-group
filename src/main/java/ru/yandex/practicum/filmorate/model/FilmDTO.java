@@ -29,5 +29,4 @@ public class FilmDTO {
     private Integer duration;
     private Set<Long> likes;
 
-
 }

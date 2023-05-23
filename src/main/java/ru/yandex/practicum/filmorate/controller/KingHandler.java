@@ -17,7 +17,7 @@ public class KingHandler {
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<?> validationExcep(final ValidationException e) {
+    public ResponseEntity<?> validationException(final ValidationException e) {
         return new ResponseEntity<>(new ErrorResponse(String.valueOf(e.getClass()), e.getMessage()), HttpStatus.valueOf(500));
     }
 
