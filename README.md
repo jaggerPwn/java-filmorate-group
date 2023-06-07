@@ -33,11 +33,11 @@
  
 2. Спроектирована схема БД:
    ![ER-диаграмма](/images/FILMORATE_DB.png)
-* Связь между User (пользователи) и User_friends (таблица сопоставления друзей) "many to many";
-* Связь между User и Film  "many to many" через табличку Likes;
-* Связь между Film и Genres  "many to many" через табличку Film_Genres; 
-* Связь между Rating и Film "one to many" т.к. rating_id уникален и может быть присвоен множеству фильмов;
-* Для таблиц User_Friends, Likes и Film_Genres использованы составные Primary Key из двух id.
+* Связь между users (пользователи) и friends (таблица сопоставления друзей) "many to many";
+* Связь между users и films  "many to many" через табличку likes;
+* Связь между film и genres  "many to many" через табличку filmgenres; 
+* Связь между mpa и film "one to many" т.к. mpaid уникален и может быть присвоен множеству фильмов;
+* Для таблиц friends, likes и filmgenres использованы составные Primary Key из двух id.
 
 3. ### Примеры запросов
 
