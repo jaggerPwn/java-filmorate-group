@@ -29,7 +29,8 @@ public class MpaDBStorage implements MpaStorage {
         if (id == null) {
             throw new ValidationException("Невозможно выполнить запрос спустым аргументом.");
         }
-        try {log.debug("Выведен жанр по id");
+        try {
+            log.debug("Выведен жанр по id");
             return jdbcTemplate.queryForObject(sqlQuery, this::mapToMpa, id);
         } catch (Throwable e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Нет такого рейтинга");
