@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
-public class LikeDBStorage  {
+public class LikeDBStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -21,20 +21,20 @@ public class LikeDBStorage  {
     }
 
 
-    public void deleteLike ( Long filmId, Long userId ){
+    public void deleteLike(Long filmId, Long userId) {
         String query = "DELETE FROM likes WHERE filmid = ? AND userid = ?";
         jdbcTemplate.update(query, filmId, userId); // в том же порядке что и в скрипте
         log.debug("Лайк у фильма с id {} от пользователся с шв {} удалён", filmId, userId);
     }
 
-    public void addLike ( Long filmId, Long userId ){
+    public void addLike(Long filmId, Long userId) {
         String query = "INSERT INTO likes (filmid, userid) VALUES  (?,?) ";
         jdbcTemplate.update(query, filmId, userId);
         log.debug("Фильму с ID {} добавлен лайк от пользователя с ID {}", filmId, userId);
     }
 
 
-    public Set<Long> getLikerByFilmId ( Long filmID ) {
+    public Set<Long> getLikerByFilmId(Long filmID) {
         String query = "SELECT userid FROM likes WHERE filmid = ?";
         List<Long> likes = jdbcTemplate.query(query, (rs, rowNum) -> rs.getLong("userid"), filmID);
         log.debug("Получен список userid лайков у фильма с id {}.", filmID);
