@@ -32,7 +32,7 @@
 1. Переработана архитектура проекта: добавлены дополнительные поля в классы Film (жанр и рейтинг) и User (список дружбы).
  
 2. Спроектирована схема БД:
-   ![ER-диаграмма](/images/FILMORATE_DB.png)
+   ![ER-диаграмма](/images/FILMORATE_DB.pdf)
 * Связь между users (пользователи) и friends (таблица сопоставления друзей) "many to many";
 * Связь между users и films  "many to many" через табличку likes;
 * Связь между film и genres  "many to many" через табличку filmgenres; 
