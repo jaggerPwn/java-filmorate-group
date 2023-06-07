@@ -1,7 +1,9 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
@@ -28,5 +30,6 @@ public class FilmDTO {
     @PositiveOrZero
     private Integer duration;
     private Set<Long> likes;
-
+    private Set<Genre> genres;
+    private Mpa mpa;
 }

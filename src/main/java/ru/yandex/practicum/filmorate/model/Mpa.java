@@ -1,21 +1,23 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
-@Getter
-@Setter
+@Data
+@Builder
+@AllArgsConstructor
 public class Mpa {
 
-    @NotNull
-    @NotBlank
-    private String ratingName;
-    private Integer ratingId;
+    private Integer id;
+    private String name;
 
-    //o	G — у фильма нет возрастных ограничений,
+    public Mpa(Integer id) {
+        this.id = id;
+    }
+
+    //o	G — у фильма нет возр
+    // астных ограничений,
     //o	PG — детям рекомендуется смотреть фильм с родителями,
     //o	PG-13 — детям до 13 лет просмотр не желателен,
     //o	R — лицам до 17 лет просматривать фильм можно только в присутствии взрослого,

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class UserDTO {
+
     private Long id;
 
     @NotBlank
@@ -21,5 +22,4 @@ public class UserDTO {
     private String name;
     @Past
     private LocalDate birthday;
-
 }

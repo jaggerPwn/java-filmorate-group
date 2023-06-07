@@ -2,16 +2,18 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.FilmDTO;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.FilmDTO;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.LikeDBStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.validation.ValidationException;
 import ru.yandex.practicum.filmorate.validation.Validator;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -19,11 +21,13 @@ import java.util.stream.Collectors;
 public class FilmServiceImpl implements FilmService {
     private final FilmStorage fs;
     private final UserStorage us;
+    private final LikeDBStorage ls;
 
     @Autowired
-    public FilmServiceImpl(FilmStorage fs, UserStorage us) {
+    public FilmServiceImpl(@Qualifier("filmDBStorage") FilmStorage fs, @Qualifier("userDBStorage") UserStorage us, LikeDBStorage ls) {
         this.fs = fs;
         this.us = us;
+        this.ls = ls;
     }
 
     @Override
@@ -31,7 +35,7 @@ public class FilmServiceImpl implements FilmService {
         Film film = FilmMapper.dtoToFilm(filmDTO);
         if (Validator.filmValidator(film)) {
             log.debug("Фильм " + filmDTO + " сохранён.");
-            return FilmMapper.filmToFilmDTO(fs.saveFilm(film));
+            return FilmMapper.filmToDTO(fs.saveFilm(film));
         }
         throw new ValidationException("Валидация фильма" + filmDTO + " не пройдена");
     }
@@ -41,7 +45,7 @@ public class FilmServiceImpl implements FilmService {
         Film film = FilmMapper.dtoToFilm(filmDTO);
         if (Validator.filmValidator(film)) {
             log.debug("Фильм " + filmDTO + " обновлён.");
-            return FilmMapper.filmToFilmDTO(fs.updateFilm(film));
+            return FilmMapper.filmToDTO(fs.updateFilm(film));
         }
         throw new ValidationException("Валидация фильма" + filmDTO + " не пройдена");
     }
@@ -49,38 +53,39 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<FilmDTO> readAllFilms() {
         log.debug("Полный список фильмов возвращён.");
-        return FilmMapper.listFilmsToListFilmsDto(fs.readAllFilms());
+        return FilmMapper.listFilmsToListDto(fs.readAllFilms());
     }
 
     @Override
     public FilmDTO getFilmByID(Long id) {
         log.debug("Фильм " + id + " возвращён.");
-        return FilmMapper.filmToFilmDTO(fs.getFilmById(id));
+        return FilmMapper.filmToDTO(fs.getFilmById(id));
     }
 
     @Override
     public void deleteLikeById(Long idFilm, Long idUser) {
         Film film = fs.getFilmById(idFilm);
         us.getUserById(idUser); // для валидации
-        film.getLikes().remove(idUser);
+        ls.deleteLike(idFilm, idUser);
         log.debug("Лайк у фильма удалён по ID");
     }
 
     @Override
     public void userLike(Long idFilm, Long idUser) {
-        Film film = fs.getFilmById(idFilm);
+        fs.getFilmById(idFilm);
         us.getUserById(idUser); // для валидации
-        film.getLikes().add(idUser);
+        ls.addLike(idFilm, idUser);
         log.debug("Лайк у фильма " + idFilm + "установлен по " + idUser + " юзера");
     }
 
     @Override
     public List<FilmDTO> readTopFilms(Long count) {
         log.debug("Вывод список из " + count + " фильмов по популярности.");
-        return readAllFilms().stream()
-                .sorted((a, b) -> b.getLikes().size() - a.getLikes().size())
-                .limit(count)
-                .collect(Collectors.toList());
-
+//        return readAllFilms().stream()
+//                .sorted((a, b) -> b.getLikes().size() - a.getLikes().size())
+//                .limit(count)
+//                .collect(Collectors.toList());
+        System.out.println(fs.readAllFilms());
+        return FilmMapper.listFilmsToListDto(fs.getTopFilms(count));
     }
 }

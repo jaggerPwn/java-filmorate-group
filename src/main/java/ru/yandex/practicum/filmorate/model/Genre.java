@@ -1,13 +1,16 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
+@Builder
+@AllArgsConstructor
 public class Genre {
-    private String genreName;
-    private Integer genreId;
+
+    private Integer id;
+    private String name;
 
     //o	Комедия.
     //o	Драма.
@@ -15,5 +18,4 @@ public class Genre {
     //o	Триллер.
     //o	Документальный.
     //o	Боевик.
-
 }

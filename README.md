@@ -28,16 +28,16 @@
 3. Настроен ExceptionHandler для централизованной обработки ошибок
 </details>
 
-* Спринт 11. Часть 1:
+# * Спринт 11. Часть 1:
 1. Переработана архитектура проекта: добавлены дополнительные поля в классы Film (жанр и рейтинг) и User (список дружбы).
  
-2. Спроектировна схема БД:
+2. Спроектирована схема БД:
    ![ER-диаграмма](/images/FILMORATE_DB.png)
 * Связь между User (пользователи) и User_friends (таблица сопоставления друзей) "many to many";
-* Связь между User и Film  "many to many" через табличку likes;
+* Связь между User и Film  "many to many" через табличку Likes;
 * Связь между Film и Genres  "many to many" через табличку Film_Genres; 
 * Связь между Rating и Film "one to many" т.к. rating_id уникален и может быть присвоен множеству фильмов;
-* Для таблиц friends, likes и film_genre_line использованы составные Primary Key из двух id.
+* Для таблиц User_Friends, Likes и Film_Genres использованы составные Primary Key из двух id.
 
 3. ### Примеры запросов
 
@@ -47,41 +47,41 @@
 * Запрос фильма по id:
 
 ```SQL
-SELECT f.film_name,
-       f.film_description,
-       f.film_releaseDate,
-       f.film_duration,
-       r.rating_name,
-       g.genre_name
-FROM Films f
-JOIN Rating r ON f.rating_id = r.rating_id
-JOIN Film_Genres fg ON f.film_id = fg.film_id
-JOIN Genres g ON fg.genre_id = g.genre_id
-WHERE f.film_id = ?
+SELECT f.name,
+       f.description,
+       f.releaseDate,
+       f.duration,
+       m.name,
+       g.name
+FROM films f
+JOIN mpa m ON f.mpaid = m.id
+JOIN filmgenres fg ON f.id = fg.filmid
+JOIN genres g ON fg.genreid = g.id
+WHERE f.id = ?;
 ```   
 
 * Запрос всех фильмов:
 
 ```SQL
-SELECT f.film_name,
-       f.film_description,
-       f.film_releaseDate,
-       f.film_duration,
-       r.rating_name,
-       g.genre_name
-FROM Films f
-JOIN Rating r ON f.rating_id = r.rating_id
-JOIN Film_Genres fg ON f.film_id = fg.film_id
-JOIN Genres g ON fg.genre_id = g.genre_id;
+SELECT f.name,
+       f.description,
+       f.releaseDate,
+       f.duration,
+       m.name,
+       g.name
+FROM films f
+JOIN mpa m ON f.mpaid = m.id
+JOIN filmgenres fg ON f.id = fg.filmid
+JOIN genres g ON fg.genreid = g.id;
 ```
 
 * Запрос топ-N фильмов по количеству лайков:
 ```SQL
-SELECT f.film_name,
-       COUNT(l.film_id) AS likes_count
-FROM Films f
-JOIN Likes l ON f.film_id = l.film_id
-GROUP BY f.film_name
+SELECT f.name,
+       COUNT(l.filmid) AS likes_count
+FROM films f
+JOIN likes l ON f.id = l.filmid
+GROUP BY f.name
 ORDER BY likes_count DESC
 LIMIT N;
 ```
@@ -94,15 +94,15 @@ LIMIT N;
 
 ```SQL
 SELECT *
-FROM Users
-WHERE user_id = ?;
+FROM users
+WHERE id = ?;
 ```   
 
 * Запрос всех пользователей:
 
 ```SQL
 SELECT *
-FROM Users;
+FROM users;
 ``` 
 
 </details>
@@ -114,15 +114,15 @@ FROM Users;
 
 ```SQL
 SELECT *
-FROM Genres
-WHERE genre_id = ?;;
+FROM genres
+WHERE id = ?;
 ``` 
 
 * Запрос всех жанров:
 
 ```SQL
 SELECT *
-FROM Genres;
+FROM genres;
 ```   
 </details>
 
@@ -133,16 +133,49 @@ FROM Genres;
 
 ```SQL
 SELECT *
-FROM Rating
-WHERE rating_id = ?;
+FROM mpa
+WHERE id = ?;
 ``` 
 
 * Запрос всех рейтингов MPA:
 
 ```SQL
 SELECT *
-FROM Rating;
+FROM mpa;
 ```   
 </details>
 
+## Инструкция по установке
 
+- [Требования](#требования)
+- [Установка](#установка)
+- [Запуск](#запуск)
+
+### Требования
+
+- Apache Maven 3.6.0 и позднее
+- JDK 11 и позднее
+
+### Установка
+
+1. Клонировать репозиторий:
+```bash
+git clone https://github.com/AKnazzz/java-filmorate.git
+```
+
+2. Перейти в корневую директорию проекта:
+```bash
+cd java-filmorate
+```
+
+3. Собрать проект, используя Maven:
+```bash
+mvn clean install
+```
+
+### Запуск
+
+После установки запустить приложение:
+```bash
+mvn spring-boot:run
+```
