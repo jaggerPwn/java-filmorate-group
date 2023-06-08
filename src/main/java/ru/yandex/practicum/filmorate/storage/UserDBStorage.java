@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,36 +32,48 @@ public class UserDBStorage implements UserStorage {
 
     @Override
     public User saveUser(User user) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users").usingGeneratedKeyColumns("id");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users")
+                .usingGeneratedKeyColumns("id");
         Number key = simpleJdbcInsert.executeAndReturnKey(user.userToMap());
         user.setId((Long) key);
-        log.debug("Юзер создан с ID {}.", user.getId());
+        log.debug("User создан с ID {}.", user.getId());
         return user;
     }
 
     @Override
-    public User updateUser(User user) { // TODO нужно ли обновлять друзей ?
+    public User updateUser(User user) {
         if (user == null || user.getId() == null) {
-            throw new ValidationException("Невалидный юзер");
-        }
-        if (getUserById(user.getId()) == null) {
-            throw new EntityNotFoundException("Юзер с таким id не найден");
+            throw new ValidationException("Невалидный User");
         }
         String sqlQuery = "UPDATE users SET email = ?, login = ?, name =?, birthday = ? WHERE id = ?";
-        jdbcTemplate.update(sqlQuery, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
-        log.debug(" User {} успешно обновлён", user.getId());
-        return user;
+        if (jdbcTemplate.update(sqlQuery, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(),
+                user.getId()) != 0) {
+            log.debug(" User {} успешно обновлён", user.getId());
+            return user;
+        } else {
+            throw new EntityNotFoundException("User с таким id не найден");
+        }
     }
 
     @Override
     public List<User> readAllUsers() {
         String sqlQuery = "SELECT * FROM users ";
-        log.debug("Все юзеры выведены");
+        log.debug("Все User получены");
         return jdbcTemplate.query(sqlQuery, this::mapToUser);
     }
 
     @Override
     public User getUserById(Long id) {
+        String sqlQuery = "SELECT * FROM users WHERE id = ?";
+        try {
+            User user = jdbcTemplate.queryForObject(sqlQuery, this::mapToUser, id);
+            log.debug("User с ID {} получен.", id);
+            return user;
+        } catch (Throwable throwable) {
+            throw new EntityNotFoundException("User с таким id не найден");
+        }
+
+//                    *** АЛЬТЕРНАТИВНОЕ РЕШЕНИЕ ***
 //        String sqlQuery = String.format("SELECT * FROM users WHERE id = %d", id);
 //        SqlRowSet userRows = jdbcTemplate.queryForRowSet(sqlQuery);
 //        User user = null;
@@ -79,14 +90,6 @@ public class UserDBStorage implements UserStorage {
 //            throw new EntityNotFoundException("Юзер с таким id не найден");
 //        }
 //        return user;
-        String sqlQuery = String.format("SELECT * FROM users WHERE id = %d", id);
-        try {
-            User user = jdbcTemplate.queryForObject(sqlQuery, this::mapToUser);
-            log.debug("Юзер с ID {} получен.", id);
-            return user;
-        } catch (Throwable throwable) {
-            throw new EntityNotFoundException("Юзер с таким id не найден");
-        }
     }
 
     private Set<Long> findFriendsByUserId(Long id) {
@@ -96,6 +99,7 @@ public class UserDBStorage implements UserStorage {
         while (friends.next()) {
             ids.add(friends.getLong("friendid"));
         }
+        log.debug("Получены все Friends (Users) у User c ID {}.", id);
         return ids;
     }
 
@@ -105,7 +109,7 @@ public class UserDBStorage implements UserStorage {
                 .email(rs.getString("email"))
                 .login(rs.getString("login"))
                 .name(rs.getString("name"))
-                .birthday(rs.getDate("birthday").toLocalDate()) //TODO добавить друзей
+                .birthday(rs.getDate("birthday").toLocalDate())
                 .friends(findFriendsByUserId(rs.getLong("id")))
                 .build();
     }
@@ -117,9 +121,9 @@ public class UserDBStorage implements UserStorage {
         String query = "INSERT INTO friends (userid, friendid) VALUES (?,?)";
         try {
             jdbcTemplate.update(query, userId, friendId);
-            log.debug("Friend с ID {} добавлен успешкно", friendId);
+            log.debug("Friend с ID {} добавлен успешно в friend к User c ID {}.", friendId, userId);
         } catch (DuplicateKeyException e) {
-            log.debug("Ошибка добавления.");
+            log.debug("Ошибка добавления Friend с ID {} в friend к User c ID {}.", friendId, userId);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
@@ -127,28 +131,24 @@ public class UserDBStorage implements UserStorage {
 
     @Override
     public void userDeleteFriend(Long userId, Long friendId) {
-        User user = getUserById(userId);
-        User friend = getUserById(friendId); // для валидации
+        getUserById(userId); // для валидации
+        getUserById(friendId); // для валидации
         String query = "DELETE FROM friends WHERE userid = ? AND friendid = ?";
         if (jdbcTemplate.update(query, userId, friendId) != 0) {
-            log.debug("У Юзера с ID {} удалён Друг {}", userId, friendId);
+            log.debug("У User с ID {} удалён friend (User) {}", userId, friendId);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Нет такого юзера");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Нет такого User");
         }
 
     }
 
     @Override
     public List<User> getAllFriendByUserId(Long id) {
-        User user = getUserById(id);
-        String query = "SELECT friendid FROM friends WHERE userid = ?";
-        List<Long> friends = jdbcTemplate.query(query, (rs, rowNum) -> rs.getLong("friendid"), id);
-        List<User> friends2 = new ArrayList<>();
-        for (Long friend : friends) {
-            friends2.add(getUserById(friend));
-        }
+        getUserById(id); // для валидации
+        String query = "SELECT * FROM users WHERE id IN (SELECT friendid FROM friends WHERE userid = ?)";
+        List<User> friends = jdbcTemplate.query(query, this::mapToUser, id);
         log.debug("Получен список friendId друзей у User с id {}.", id);
-        return friends2;
+        return friends;
     }
 
 }

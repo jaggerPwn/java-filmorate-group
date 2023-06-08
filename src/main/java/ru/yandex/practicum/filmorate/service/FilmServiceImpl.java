@@ -24,7 +24,8 @@ public class FilmServiceImpl implements FilmService {
     private final LikeDBStorage ls;
 
     @Autowired
-    public FilmServiceImpl(@Qualifier("filmDBStorage") FilmStorage fs, @Qualifier("userDBStorage") UserStorage us, LikeDBStorage ls) {
+    public FilmServiceImpl(@Qualifier("filmDBStorage") FilmStorage fs, @Qualifier("userDBStorage") UserStorage us,
+            LikeDBStorage ls) {
         this.fs = fs;
         this.us = us;
         this.ls = ls;
@@ -34,40 +35,40 @@ public class FilmServiceImpl implements FilmService {
     public FilmDTO saveFilm(FilmDTO filmDTO) {
         Film film = FilmMapper.dtoToFilm(filmDTO);
         if (Validator.filmValidator(film)) {
-            log.debug("Фильм " + filmDTO + " сохранён.");
+            log.debug("Film {} сохранён.", filmDTO.getId());
             return FilmMapper.filmToDTO(fs.saveFilm(film));
         }
-        throw new ValidationException("Валидация фильма" + filmDTO + " не пройдена");
+        throw new ValidationException("Валидация Film " + filmDTO + " не пройдена");
     }
 
     @Override
     public FilmDTO updateFilm(FilmDTO filmDTO) {
         Film film = FilmMapper.dtoToFilm(filmDTO);
         if (Validator.filmValidator(film)) {
-            log.debug("Фильм " + filmDTO + " обновлён.");
+            log.debug("Film c ID {} обновлён.", filmDTO.getId());
             return FilmMapper.filmToDTO(fs.updateFilm(film));
         }
-        throw new ValidationException("Валидация фильма" + filmDTO + " не пройдена");
+        throw new ValidationException("Валидация Film " + filmDTO + " не пройдена");
     }
 
     @Override
     public List<FilmDTO> readAllFilms() {
-        log.debug("Полный список фильмов возвращён.");
+        log.debug("Полный список Films возвращён.");
         return FilmMapper.listFilmsToListDto(fs.readAllFilms());
     }
 
     @Override
     public FilmDTO getFilmByID(Long id) {
-        log.debug("Фильм " + id + " возвращён.");
+        log.debug("Film c ID {} возвращён.", id);
         return FilmMapper.filmToDTO(fs.getFilmById(id));
     }
 
     @Override
     public void deleteLikeById(Long idFilm, Long idUser) {
-        Film film = fs.getFilmById(idFilm);
+        fs.getFilmById(idFilm);
         us.getUserById(idUser); // для валидации
         ls.deleteLike(idFilm, idUser);
-        log.debug("Лайк у фильма удалён по ID");
+        log.debug("Лайк User c ID {} удалён у Film c ID {}", idUser, idFilm);
     }
 
     @Override
@@ -75,17 +76,12 @@ public class FilmServiceImpl implements FilmService {
         fs.getFilmById(idFilm);
         us.getUserById(idUser); // для валидации
         ls.addLike(idFilm, idUser);
-        log.debug("Лайк у фильма " + idFilm + "установлен по " + idUser + " юзера");
+        log.debug("Лайк у User c ID {} установлен Film c ID {}.", idUser, idFilm);
     }
 
     @Override
     public List<FilmDTO> readTopFilms(Long count) {
-        log.debug("Вывод список из " + count + " фильмов по популярности.");
-//        return readAllFilms().stream()
-//                .sorted((a, b) -> b.getLikes().size() - a.getLikes().size())
-//                .limit(count)
-//                .collect(Collectors.toList());
-        System.out.println(fs.readAllFilms());
+        log.debug("Получен список из {} Film по кол-ву Likes.", count);
         return FilmMapper.listFilmsToListDto(fs.getTopFilms(count));
     }
 }

@@ -406,7 +406,8 @@ class FilmorateApplicationTests {
         userDBStorage.saveUser(friend);
         userDBStorage.userAddFriend(1L, 2L);
         User[] expected = {friend};
-        Assertions.assertArrayEquals(expected, userDBStorage.getAllFriendByUserId(1L).toArray(), "Ожидалось добавление friend к конкретному User");
+        Assertions.assertArrayEquals(expected, userDBStorage.getAllFriendByUserId(1L).toArray(), "Ожидалось "
+                + "добавление friend к конкретному User");
     }
 
     @DisplayName("Тест удаления Friend у существующего User по Id")

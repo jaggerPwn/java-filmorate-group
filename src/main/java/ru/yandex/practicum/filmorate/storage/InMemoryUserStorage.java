@@ -23,7 +23,7 @@ public class InMemoryUserStorage implements UserStorage {
         user.setId(idUser);
         users.put(user.getId(), user);
         idUser++;
-        log.debug("Пользователь создан");
+        log.debug("User c ID {} создан", user.getId());
         return user;
     }
 
@@ -32,27 +32,27 @@ public class InMemoryUserStorage implements UserStorage {
 
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
-            log.debug("Пользователь успешно обновлён");
+            log.debug("User c ID {} успешно обновлён", user.getId());
             return user;
         } else {
-            log.debug("Пользователь не обновлён");
+            log.debug("User c ID {} не обновлён", user.getId());
             throw new EntityNotFoundException("Нет такого ID");
         }
     }
 
     @Override
     public List<User> readAllUsers() {
-        log.debug("Вывод списка фильмов");
+        log.debug("Получен список всех Users");
         return new ArrayList<>(users.values());
     }
 
     @Override
     public User getUserById(Long id) {
         if (users.containsKey(id)) {
-            log.debug("Юзер получен по ID");
+            log.debug("User c ID {} получен", id);
             return users.get(id);
         } else {
-            log.debug("Юзер не получен по ID");
+            log.debug("User c ID {} не получен", id);
             throw new EntityNotFoundException("Пользователь не найден");
         }
     }

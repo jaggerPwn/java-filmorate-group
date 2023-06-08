@@ -36,14 +36,14 @@ public class GenreDBStorage implements GenreStorage {
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapToGenre, id);
         } catch (Throwable e) {
-            throw new ResponseStatusException(HttpStatus.valueOf(404), "Нет такого жанра");
+            throw new ResponseStatusException(HttpStatus.valueOf(404), "Нет такого Genre");
         }
     }
 
     @Override
     public List<Genre> readAll() {
         String sqlQuery = "SELECT * FROM genres ORDER BY id";
-        log.debug("Все жанры получены.");
+        log.debug("Все Genres получены.");
         return jdbcTemplate.query(sqlQuery, this::mapToGenre);
     }
 
@@ -55,9 +55,9 @@ public class GenreDBStorage implements GenreStorage {
     }
 
     public Set<Genre> getGenresByFilmID(Long filmId) {
-        String sqlQuery = "SELECT genreid, name FROM filmgenres INNER JOIN genres ON genreid = id WHERE filmid = ?"; // TODO если что вдруг добавить алиасы
+        String sqlQuery = "SELECT genreid, name FROM filmgenres INNER JOIN genres ON genreid = id WHERE filmid = ?";
         List<Genre> genres = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> new Genre(rs.getInt("genreid"), rs.getString("name")), filmId);
-        log.debug("Получен список genres  для фильма с id {}", filmId);
+        log.debug("Получен список Genres  для Film с id {}", filmId);
         return new HashSet<>(genres);
     }
 }

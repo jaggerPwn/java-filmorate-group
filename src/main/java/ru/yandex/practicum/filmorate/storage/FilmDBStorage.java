@@ -47,6 +47,7 @@ public class FilmDBStorage implements FilmStorage {
                 jdbcTemplate.update(query, film.getId(), genre.getId());
             }
         }
+        log.debug("Film c ID {} сохранён.", film.getId());
         return film;
     }
 
@@ -57,7 +58,7 @@ public class FilmDBStorage implements FilmStorage {
         }
         String sqlQuery = "UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ?, mpaid = ? WHERE id = ?";
         if (jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId()) != 0) {
-            log.info("Фильм c id {} обновлён", film.getId());
+            log.info("Film c id {} обновлён", film.getId());
         } else {
             throw new EntityNotFoundException("Film с таким id не существует");
         }
@@ -78,19 +79,11 @@ public class FilmDBStorage implements FilmStorage {
         return film;
     }
 
-    //      .name(rs.getString("name"))
-    //                .description(rs.getString("description"))
-    //                .releaseDate(rs.getDate("date").toLocalDate())
-    //                .mpa(mpaDBStorage.readById(rs.getInt("mpaid")))
-    //                .likes(likeDBStorage.getLikerByFilmId(rs.getLong("id")))
-    //                .genres(genreStorage.getGenresByFilmID(rs.getLong("id")))
-    //                .build();
-
     @Override
     public List<Film> readAllFilms() {
         String query = "SELECT * FROM films";
         List<Film> films = jdbcTemplate.query(query, this::mapToFilm);
-        log.debug("Получены все фильмы из списка");
+        log.debug("Получены все Film.");
         return films;
     }
 
@@ -109,19 +102,19 @@ public class FilmDBStorage implements FilmStorage {
                     .likes(likeDBStorage.getLikerByFilmId(sqlRowSet.getLong("id")))
                     .mpa(mpaDBStorage.readById(sqlRowSet.getInt("mpaid")))
                     .build();
-            log.debug("Получен фильм с ID {}.", id);
+            log.debug("Получен Film с ID {}.", id);
             return film;
         } else {
-            throw new EntityNotFoundException("Пользователь не найден");
+            throw new EntityNotFoundException("Film не найден");
         }
     }
 
     @Override
-    public Set<Film> getTopFilms(Long count) { // TODO добавить алиасы если будет ошибка
+    public Set<Film> getTopFilms(Long count) {
         String query = "SELECT id, name, description, releaseDate, duration, mpaid FROM films " +
                 "LEFT JOIN likes ON id = filmid GROUP BY id ORDER BY count(userid) desc  LIMIT ?";
         List<Film> topFilms = jdbcTemplate.query(query, this::mapToFilm, count);
-        log.debug("Получаем топ {} фильмов по кол-ву лайков.", count);
+        log.debug("Получаем топ {} Film по кол-ву Likes.", count);
         return new HashSet<>(topFilms);
     }
 

@@ -30,17 +30,17 @@ public class MpaDBStorage implements MpaStorage {
             throw new ValidationException("Невозможно выполнить запрос спустым аргументом.");
         }
         try {
-            log.debug("Выведен жанр по id");
+            log.debug("Получен Mpa по id {}.", id);
             return jdbcTemplate.queryForObject(sqlQuery, this::mapToMpa, id);
         } catch (Throwable e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Нет такого рейтинга");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Нет такого Mpa");
         }
     }
 
     @Override
     public List<Mpa> readAll() {
         String sqlQuery = "SELECT * FROM mpa ORDER BY id";
-        log.debug("Все рейтинги выведены");
+        log.debug("Все Mpa получены");
         return jdbcTemplate.query(sqlQuery, this::mapToMpa);
     }
 
