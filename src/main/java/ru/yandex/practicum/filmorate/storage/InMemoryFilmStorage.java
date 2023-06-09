@@ -5,10 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -22,7 +19,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         film.setId(genId);
         films.put(film.getId(), film);
         genId++;
-        log.debug("Фильм успешно сохранён");
+        log.debug("Film c ID {} успешно сохранён.", film.getId());
         return film;
     }
 
@@ -30,17 +27,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film updateFilm(Film film) {
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
-            log.debug("Фильм успешно обновлён");
+            log.debug("Film c ID {} успешно обновлён", film.getId());
             return film;
         } else {
-            log.debug("Фильм не обновлён");
+            log.debug("Film c ID {} не обновлён", film.getId());
             throw new EntityNotFoundException("Нет такого ID");
         }
     }
 
     @Override
     public List<Film> readAllFilms() {
-        log.debug("Вывод списка фильмов");
+        log.debug("Получен список всех Film");
         return new ArrayList<>(films.values());
     }
 
@@ -48,12 +45,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film getFilmById(Long id) {
 
         if (films.containsKey(id)) {
-            log.debug("Фильм по ID получен");
+            log.debug("Film с ID {} получен", id);
             return films.get(id);
         } else {
-            log.debug("Фильм по ID не получен");
-            throw new EntityNotFoundException("Фильм с ID не найден");
+            log.debug("Film с ID {} не получен", id);
+            throw new EntityNotFoundException("Film с ID не найден");
         }
 
+    }
+
+    @Override
+    public Set<Film> getTopFilms(Long count) {
+        return null;
     }
 }

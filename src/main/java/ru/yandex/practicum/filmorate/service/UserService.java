@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.model.UserDTO;
+import ru.yandex.practicum.filmorate.dto.UserDTO;
 
 import java.util.List;
 

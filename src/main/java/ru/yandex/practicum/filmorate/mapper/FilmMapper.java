@@ -1,7 +1,7 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.mapper;
 
+import ru.yandex.practicum.filmorate.dto.FilmDTO;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.FilmDTO;
 
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +12,7 @@ public class FilmMapper {
     private FilmMapper() {
     }
 
-    public static FilmDTO filmToFilmDTO(Film film) {
+    public static FilmDTO filmToDTO(Film film) {
         if (film == null) {
             return null;
         }
@@ -24,6 +24,8 @@ public class FilmMapper {
                 .releaseDate(film.getReleaseDate())
                 .duration(film.getDuration())
                 .likes(film.getLikes())
+                .genres(film.getGenres())
+                .mpa(film.getMpa())
                 .build();
     }
 
@@ -38,11 +40,14 @@ public class FilmMapper {
                 .description(filmDTO.getDescription())
                 .releaseDate(filmDTO.getReleaseDate())
                 .duration(filmDTO.getDuration())
+                .likes(filmDTO.getLikes())
+                .genres(filmDTO.getGenres())
+                .mpa(filmDTO.getMpa())
                 .build();
     }
 
-    public static List<FilmDTO> listFilmsToListFilmsDto(Collection<Film> films) {
-        return films.stream().map(FilmMapper::filmToFilmDTO).collect(Collectors.toList());
+    public static List<FilmDTO> listFilmsToListDto(Collection<Film> films) {
+        return films.stream().map(FilmMapper::filmToDTO).collect(Collectors.toList());
     }
 
 }

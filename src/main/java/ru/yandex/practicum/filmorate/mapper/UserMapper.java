@@ -1,7 +1,7 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.mapper;
 
+import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.UserDTO;
 
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +12,7 @@ public class UserMapper {
     private UserMapper() {
     }
 
-    public static UserDTO userToUserDTO(User user) {
+    public static UserDTO userToDTO(User user) {
         if (user == null) {
             return null;
         }
@@ -26,7 +26,7 @@ public class UserMapper {
                 .build();
     }
 
-    public static User userToUser(UserDTO userDTO) {
+    public static User dtoToUser(UserDTO userDTO) {
         if (userDTO == null) {
             return null;
         }
@@ -40,8 +40,8 @@ public class UserMapper {
                 .build();
     }
 
-    public static List<UserDTO> listUsersToListUserDto(Collection<User> users) {
-        return users.stream().map(UserMapper::userToUserDTO).collect(Collectors.toList());
+    public static List<UserDTO> listUsersToListDto(Collection<User> users) {
+        return users.stream().map(UserMapper::userToDTO).collect(Collectors.toList());
     }
 
 }
