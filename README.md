@@ -183,8 +183,7 @@ mvn spring-boot:run
 ```
 </details>
 
-# Спринт 12
 
+# * Спринт 12
 https://dbdiagram.io/d/64833537722eb77494b25d51
-
 ![](images/FILMORATE_DBSPR12.png)
