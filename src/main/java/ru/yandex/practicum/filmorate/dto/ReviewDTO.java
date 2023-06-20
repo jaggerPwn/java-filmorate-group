@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -9,8 +9,9 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class ReviewDTO {
     @NotNull
-    private long id;
+    private long reviewId;
     private String content;
+    @JsonProperty(value = "isPositive")
     private boolean isPositive;
     @NotNull
     private long userId;

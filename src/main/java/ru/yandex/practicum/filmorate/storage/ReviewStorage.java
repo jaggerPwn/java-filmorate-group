@@ -10,7 +10,7 @@ public interface ReviewStorage {
 
     Review updateReview(Review review);
 
-    List<Review> readAllReviews();
+    List<Review> readAllReviews(Long filmId, Long count);
 
     Review getReviewById(Long id);
 

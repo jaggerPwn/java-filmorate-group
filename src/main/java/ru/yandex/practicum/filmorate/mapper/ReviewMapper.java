@@ -15,7 +15,7 @@ public class ReviewMapper {
         }
 
         return ReviewDTO.builder()
-                .id(review.getId())
+                .reviewId(review.getReviewId())
                 .content(review.getContent())
                 .filmId(review.getFilmId())
                 .userId(review.getUserId())
@@ -30,7 +30,7 @@ public class ReviewMapper {
         }
 
         return Review.builder()
-                .id(reviewDTO.getId())
+                .reviewId(reviewDTO.getReviewId())
                 .content(reviewDTO.getContent())
                 .filmId(reviewDTO.getFilmId())
                 .userId(reviewDTO.getUserId())

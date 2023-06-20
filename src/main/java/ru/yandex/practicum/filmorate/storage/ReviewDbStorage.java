@@ -44,7 +44,7 @@ public class ReviewDbStorage implements ReviewStorage {
             return statement;
         }, keyHolder);
         try {
-            review.setId(keyHolder.getKey().longValue());
+            review.setReviewId(keyHolder.getKey().longValue());
         } catch (InvalidDataAccessApiUsageException | NullPointerException e) {
             e.printStackTrace();
             throw new ValidationException("key not assigned");
@@ -54,13 +54,28 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review updateReview(Review review) {
-        return null;
+
+        String sqlQuery = "UPDATE PUBLIC.REVIEWS\n" +
+                "SET CONTENT= ?, ISPOSITIVE= ?, USERID= ?, FILMID= ?, USEFUL= ?\n" +
+                "WHERE ID=?";
+        jdbcTemplate.update(sqlQuery, review.getContent(), review.isPositive(), review.getUserId(),
+                review.getFilmId(), review.getUseful(), review.getReviewId());
+        return getReviewById(review.getReviewId());
     }
 
     @Override
-    public List<Review> readAllReviews() {
-        return null;
+    public List<Review> readAllReviews(Long filmId, Long count) {
+        if (count == null) count = 10L;
+        if (filmId == null) {
+            String sqlQuery = "SELECT ID, CONTENT, ISPOSITIVE, USERID, FILMID, USEFUL " +
+                    "FROM PUBLIC.REVIEWS LIMIT ?";
+            return jdbcTemplate.query(sqlQuery, ReviewDbStorage::mapToReview, count);
+        }
+        String sqlQuery = "SELECT ID, CONTENT, ISPOSITIVE, USERID, FILMID, USEFUL " +
+                "FROM PUBLIC.REVIEWS WHERE FILMID = ? LIMIT ?";
+        return jdbcTemplate.query(sqlQuery, ReviewDbStorage::mapToReview, filmId, count);
     }
+
 
     @Override
     public Review getReviewById(Long id) {
@@ -68,7 +83,7 @@ public class ReviewDbStorage implements ReviewStorage {
                 "FROM PUBLIC.REVIEWS where ID =  ?";
         Review review;
         try {
-            review = jdbcTemplate.queryForObject(sqlQuery, this::mapToReview, id);
+            review = jdbcTemplate.queryForObject(sqlQuery, ReviewDbStorage::mapToReview, id);
         } catch (DataAccessException e) {
             throw new ValidationException("review " + id + " not found");
         }
@@ -77,12 +92,13 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public void deleteReviewById(Long id) {
-
+        String sqlQuery = "DELETE FROM PUBLIC.REVIEWS WHERE ID=?";
+        jdbcTemplate.update(sqlQuery, id);
     }
 
-    private Review mapToReview(ResultSet resultSet, int i) throws SQLException {
+    public static Review mapToReview(ResultSet resultSet, int i) throws SQLException {
         return Review.builder()
-                .id(resultSet.getLong("id"))
+                .reviewId(resultSet.getLong("id"))
                 .content(resultSet.getString("content"))
                 .filmId(resultSet.getLong("filmId"))
                 .userId(resultSet.getLong("userId"))

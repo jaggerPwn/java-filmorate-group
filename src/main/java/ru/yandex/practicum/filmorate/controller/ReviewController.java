@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.dto.ReviewDTO;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -30,7 +31,28 @@ public class ReviewController {
 
     @GetMapping("{reviewId}")
     public ResponseEntity<ReviewDTO> getReview(@PathVariable Long reviewId) {
-        log.info("Получен GET запрос по эндпоинту '/reviews' на получение поста " + reviewId);
+        log.info("Получен GET запрос по эндпоинту '/reviews/{reviewId}' на получение поста " + reviewId);
         return new ResponseEntity<>(reviewService.getReviewById(reviewId), HttpStatus.OK);
     }
+
+    @GetMapping
+    public ResponseEntity<List<ReviewDTO>> getAllReviews(
+            @RequestParam(value = "filmId", required = false) Long filmId,
+            @RequestParam(value = "count", defaultValue = "10", required = false) Long count) {
+        log.info("Получен GET запрос по эндпоинту '/reviews' на получение всех постов ");
+        return new ResponseEntity<>(reviewService.getAllReviews(filmId, count), HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<ReviewDTO> updateReview(@RequestBody @Valid ReviewDTO reviewDTO) {
+        log.info("Получен PUT запрос по эндпоинту '/reviews' на изменение поста");
+        return new ResponseEntity<>(reviewService.updateReview(reviewDTO), HttpStatus.OK);
+    }
+
+    @DeleteMapping("{filmId}")
+    public void deleteFilmById(@PathVariable Long filmId) {
+        log.info("Получен Delete запрос по эндпоинту '/films/{filmId}' на удаление фильма по ID");
+        reviewService.deleteFilmById(filmId);
+    }
+
 }
