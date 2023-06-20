@@ -20,4 +20,6 @@ public interface FilmService {
 
     List<FilmDTO> readTopFilms(Long count);
 
+    void deleteFilm(Long id);
+
 }

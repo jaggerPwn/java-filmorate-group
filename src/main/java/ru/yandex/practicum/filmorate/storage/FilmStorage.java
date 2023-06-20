@@ -17,4 +17,6 @@ public interface FilmStorage {
 
     Set<Film> getTopFilms(Long count);
 
+    void deleteFilm(Long id);
+
 }
