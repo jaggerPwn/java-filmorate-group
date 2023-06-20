@@ -522,6 +522,7 @@ class FilmorateApplicationTests {
                 .birthday(LocalDate.of(1998, 6, 26))
                 .friends(new HashSet<>())
                 .build();
+
         userDBStorage.saveUser(user);
         userDBStorage.saveUser(friend);
         userDBStorage.saveUser(friend2);
