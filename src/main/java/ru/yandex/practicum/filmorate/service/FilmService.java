@@ -20,4 +20,6 @@ public interface FilmService {
 
     List<FilmDTO> readTopFilms(Long count);
 
+    List<FilmDTO> getCommonFilms (Long userId, Long friendId);
+
 }

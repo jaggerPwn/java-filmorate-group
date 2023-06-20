@@ -380,6 +380,61 @@ class FilmorateApplicationTests {
                 "всех существующих Like у Film с конкретным id");
     }
 
+    @DisplayName("Тест получения Common films у двух User")
+    @Test
+    public void getCommonFilmsTestByUsersId() {
+        Film film = Film.builder()
+                .id(1L)
+                .name("Snatch")
+                .description("Cool film")
+                .releaseDate(LocalDate.of(2000, 8, 23))
+                .duration(120)
+                .genres(Set.of(new Genre(1, "Комедия")))
+                .likes(new HashSet<>())
+                .mpa(new Mpa(4, "R"))
+                .build();
+        filmDBStorage.saveFilm(film);
+
+        Film film2 = Film.builder()
+                .id(2L)
+                .name("The Big Lebowski")
+                .description("Cool film")
+                .releaseDate(LocalDate.of(1998, 1, 18))
+                .duration(120)
+                .genres(Set.of(new Genre(1, "Комедия")))
+                .likes(new HashSet<>())
+                .mpa(new Mpa(4, "R"))
+                .build();
+        filmDBStorage.saveFilm(film2);
+
+        User user = User.builder()
+                .id(1L)
+                .name("Andrey")
+                .email("ak@aknaz.ru")
+                .login("AKnaz")
+                .birthday(LocalDate.of(1988, 5, 29))
+                .friends(new HashSet<>())
+                .build();
+        userDBStorage.saveUser(user);
+        likeDBStorage.addLike(1L, 1L);
+        likeDBStorage.addLike(2L, 1L);
+
+        User user2 = User.builder()
+                .id(2L)
+                .name("Pavel")
+                .email("pavel@yandex.ru")
+                .login("pasHtetKING")
+                .birthday(LocalDate.of(1999, 8, 12))
+                .friends(new HashSet<>())
+                .build();
+        userDBStorage.saveUser(user2);
+        likeDBStorage.addLike(1L, 2L);
+
+        Film [] expected = {filmDBStorage.getFilmById(1L)};
+        Assertions.assertArrayEquals(expected, filmDBStorage.getCommonFilms(1L,2L).toArray(), "Ожидалось "
+                + "получение всех существующих Common Film у двух Users. ");
+    }
+
 
     //ТЕСТЫ FRIENDS
 

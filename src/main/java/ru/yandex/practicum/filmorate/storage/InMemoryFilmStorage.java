@@ -58,4 +58,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Set<Film> getTopFilms(Long count) {
         return null;
     }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return null;
+    }
+
 }

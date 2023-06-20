@@ -131,4 +131,19 @@ public class FilmDBStorage implements FilmStorage {
                 .build();
     }
 
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) { //TODO прогнать тесты в Postman
+
+        String query = "SELECT * FROM films f "
+                + "LEFT JOIN likes l1 ON f.id = l1.filmid "
+                + "LEFT JOIN likes l2 ON f.id = l2.filmid "
+                + "WHERE l1.userId =? AND l2.userId =? "
+                + "GROUP BY f.id "
+                + "ORDER BY count (l1.userId) DESC";
+
+        List<Film> commonFilms = jdbcTemplate.query(query, this::mapToFilm, userId, friendId);
+        log.debug("Получены фильмы общие у Users userId {} и friend id {}.", userId, friendId);
+        return commonFilms;
+    }
+
 }
