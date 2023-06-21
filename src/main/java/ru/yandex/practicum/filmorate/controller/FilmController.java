@@ -76,7 +76,6 @@ public class FilmController {
 
     @GetMapping("search")
     public ResponseEntity<List<FilmDTO>> getAllFilms() {
-        // ваш код для получения списка всех фильмов
         return new ResponseEntity<>(service.topFilms(), HttpStatus.OK);
     }
 
