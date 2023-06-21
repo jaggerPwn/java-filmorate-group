@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.validation;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -65,4 +66,17 @@ public class Validator {
         return true;
     }
 
+    public static boolean reviewValidator(Review review) {
+        if (review.getIsPositive() == null) {
+            throw new ValidationException("Review must have property isPositive");
+        }
+        if (review.getUserId() < 0 || review.getUserId() == null) {
+            throw new ValidationException("ReviewID must have property more then 0");
+        }
+        if (review.getFilmId() < 0 || review.getFilmId() == null) {
+            throw new ValidationException("FILMID must have property more then 0");
+        }
+        log.debug("review validation is successful");
+        return true;
+    }
 }

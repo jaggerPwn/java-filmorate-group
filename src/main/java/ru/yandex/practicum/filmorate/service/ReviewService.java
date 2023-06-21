@@ -15,4 +15,8 @@ public interface ReviewService {
     ReviewDTO updateReview(ReviewDTO reviewDTO);
 
     void deleteFilmById(Long filmId);
+
+    void addReviewLike(Long reviewId, Long userId);
+
+    void addReviewDISLike(Long reviewId, Long userId);
 }

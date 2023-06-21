@@ -55,4 +55,22 @@ public class ReviewController {
         reviewService.deleteFilmById(filmId);
     }
 
+    @PutMapping("{reviewId}/like/{userId}")
+    public void addReviewLike(
+            @RequestParam(value = "reviewId") Long reviewId,
+            @RequestParam(value = "userId") Long userId) {
+        log.info(String.format("Получен PUT запрос по эндпоинту '/reviews/:reviewId/like/:userId' " +
+                "на лайк поста %d юзером%d", reviewId, userId));
+        reviewService.addReviewLike(reviewId, userId);
+    }
+
+    @PutMapping("{reviewId}/dislike/{userId}")
+    public void addReviewDisLike(
+            @PathVariable Long reviewId,
+            @PathVariable Long userId) {
+        log.info(String.format("Получен PUT запрос по эндпоинту '/reviews/:reviewId/like/:userId' " +
+                "на DISлайк поста %d юзером%d", reviewId, userId));
+        reviewService.addReviewDISLike(reviewId, userId);
+    }
+
 }

@@ -41,6 +41,24 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public void addReviewLike(Long reviewId, Long userId) {
+        //TODO валидация на наличие лайка
+        //TODO добавить проверку был ли лайк от пользователя
+        ReviewDTO review = getReviewById(reviewId);
+        long useful = review.getUseful() + 1;
+        review.setUseful(useful);
+        updateReview(review);
+    }
+
+    @Override
+    public void addReviewDISLike(Long reviewId, Long userId) {
+        ReviewDTO review = getReviewById(reviewId);
+        long useful = review.getUseful() - 1;
+        review.setUseful(useful);
+        updateReview(review);
+    }
+
+    @Override
     public ReviewDTO getReviewById(long reviewId) {
         log.debug("Review c ID c {} получен.", reviewId);
         return ReviewMapper.reviewToDTO(rs.getReviewById(reviewId));

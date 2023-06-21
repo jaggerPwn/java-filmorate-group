@@ -10,6 +10,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.validation.Validator;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,6 +32,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review saveReview(Review review) {
+        Validator.reviewValidator(review);
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String sqlInsert = "INSERT INTO PUBLIC.\"REVIEWS\"\n" +
                 "(content, ispositive, userid, filmid)" +
@@ -38,7 +40,7 @@ public class ReviewDbStorage implements ReviewStorage {
         jdbcTemplate.update(con -> {
             PreparedStatement statement = con.prepareStatement(sqlInsert, new String[]{"ID"});
             statement.setString(1, review.getContent());
-            statement.setBoolean(2, review.isPositive());
+            statement.setBoolean(2, review.getIsPositive());
             statement.setLong(3, review.getUserId());
             statement.setLong(4, review.getFilmId());
             return statement;
@@ -54,12 +56,11 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review updateReview(Review review) {
-
+        Validator.reviewValidator(review);
         String sqlQuery = "UPDATE PUBLIC.REVIEWS\n" +
-                "SET CONTENT= ?, ISPOSITIVE= ?, USERID= ?, FILMID= ?, USEFUL= ?\n" +
+                "SET CONTENT= ?, ISPOSITIVE= ? \n" +
                 "WHERE ID=?";
-        jdbcTemplate.update(sqlQuery, review.getContent(), review.isPositive(), review.getUserId(),
-                review.getFilmId(), review.getUseful(), review.getReviewId());
+        jdbcTemplate.update(sqlQuery, review.getContent(), review.getIsPositive(), review.getReviewId());
         return getReviewById(review.getReviewId());
     }
 
