@@ -89,4 +89,9 @@ public class FilmServiceImpl implements FilmService {
     public List<FilmDTO> getCommonFilms(Long userId, Long friendId) {
         return FilmMapper.listFilmsToListDto(fs.getCommonFilms(userId,friendId));
     }
+
+    @Override
+    public void deleteFilm(Long id) {
+        fs.deleteFilm(id);
+    }
 }

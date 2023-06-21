@@ -149,20 +149,22 @@ class FilmorateApplicationTests {
         Assertions.assertEquals(user, userDBStorage.getUserById(1L), "Ожидался коррктный User");
     }
 
-//    @Test
-//    public void deleteUserTest(){
-//        User user = User.builder()
-//                .id(1L)
-//                .name("123")
-//                .email("123@asd.ru")
-//                .login("Tert")
-//                .birthday(LocalDate.of(1988, 5, 29))
-//                .friends(new HashSet<>())
-//                .build();
-//        userDBStorage.saveUser(user);
-//        Assertions.assertEquals(1,userDBStorage.readAllUsers().size());
-//        userDBStorage.
-//    }
+    @DisplayName("Тест DELETE существующего User по ID")
+    @Test
+    public void deleteUserTest(){
+        User user = User.builder()
+                .id(1L)
+                .name("123")
+                .email("123@asd.ru")
+                .login("Tert")
+                .birthday(LocalDate.of(1988, 5, 29))
+                .friends(new HashSet<>())
+                .build();
+        userDBStorage.saveUser(user);
+        Assertions.assertEquals(1,userDBStorage.readAllUsers().size());
+        userDBStorage.deleteUser(user.getId());
+        Assertions.assertEquals(0,userDBStorage.readAllUsers().size());
+    }
 
     @DisplayName("Тест получения всех существующих User")
     @Test
@@ -272,6 +274,24 @@ class FilmorateApplicationTests {
         Assertions.assertEquals(film, filmDBStorage.getFilmById(1L), "Ожидались коррктный Film с конкретным id");
     }
 
+    @DisplayName("Тест DELETE существующего Film по ID")
+    @Test
+    public void deleteFilmTest(){
+        Film film = Film.builder()
+                .id(1L)
+                .name("Snatch")
+                .description("Cool film")
+                .releaseDate(LocalDate.of(2000, 8, 23))
+                .duration(120)
+                .genres(Set.of(new Genre(1, "Комедия")))
+                .likes(new HashSet<>())
+                .mpa(new Mpa(4, "R"))
+                .build();
+        filmDBStorage.saveFilm(film);
+        Assertions.assertEquals(1,filmDBStorage.readAllFilms().size());
+        filmDBStorage.deleteFilm(film.getId());
+        Assertions.assertEquals(0,filmDBStorage.readAllFilms().size());
+    }
 
     //ТЕСТЫ LIKES
 

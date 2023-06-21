@@ -27,7 +27,8 @@ public class FilmDBStorage implements FilmStorage {
     private final LikeDBStorage likeDBStorage;
 
     @Autowired
-    public FilmDBStorage(JdbcTemplate jdbcTemplate, MpaDBStorage mpaDBStorage, GenreStorage genreStorage, LikeDBStorage likeDBStorage) {
+    public FilmDBStorage(JdbcTemplate jdbcTemplate, MpaDBStorage mpaDBStorage, GenreStorage genreStorage,
+            LikeDBStorage likeDBStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.mpaDBStorage = mpaDBStorage;
         this.genreStorage = genreStorage;
@@ -36,7 +37,8 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public Film saveFilm(Film film) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("films").usingGeneratedKeyColumns("id");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("films")
+                .usingGeneratedKeyColumns("id");
         Number key = simpleJdbcInsert.executeAndReturnKey(film.filmToMap());
         film.setId((Long) key);
         film.setMpa(mpaDBStorage.readById(film.getMpa().getId()));
@@ -47,6 +49,7 @@ public class FilmDBStorage implements FilmStorage {
                 jdbcTemplate.update(query, film.getId(), genre.getId());
             }
         }
+        film.setGenres(genreStorage.getGenresByFilmID(film.getId()));
         log.debug("Film c ID {} сохранён.", film.getId());
         return film;
     }
@@ -56,8 +59,10 @@ public class FilmDBStorage implements FilmStorage {
         if (film == null) {
             throw new ValidationException("Film не найден");
         }
-        String sqlQuery = "UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ?, mpaid = ? WHERE id = ?";
-        if (jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId()) != 0) {
+        String sqlQuery
+                = "UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ?, mpaid = ? WHERE id = ?";
+        if (jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(),
+                film.getDuration(), film.getMpa().getId(), film.getId()) != 0) {
             log.info("Film c id {} обновлён", film.getId());
         } else {
             throw new EntityNotFoundException("Film с таким id не существует");
@@ -129,6 +134,16 @@ public class FilmDBStorage implements FilmStorage {
                 .likes(likeDBStorage.getLikerByFilmId(rs.getLong("id")))
                 .genres(genreStorage.getGenresByFilmID(rs.getLong("id")))
                 .build();
+    }
+
+    @Override
+    public void deleteFilm(Long id) {
+        String query = "DELETE FROM films WHERE id = ?";
+        if (jdbcTemplate.update(query, id) != 0) {
+            log.info("Film с Id {} удалён.", id);
+        } else {
+            log.info("Film с Id {} не найден.", id);
+        }
     }
 
     @Override
