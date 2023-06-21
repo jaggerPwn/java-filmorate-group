@@ -17,4 +17,6 @@ public interface FilmStorage {
 
     Set<Film> getTopFilms(Long count);
 
+    List<Film> getSortedFilms(Long id, String sortBy);
+
 }

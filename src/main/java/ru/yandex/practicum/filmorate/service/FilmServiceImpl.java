@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.FilmDTO;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -25,7 +26,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Autowired
     public FilmServiceImpl(@Qualifier("filmDBStorage") FilmStorage fs, @Qualifier("userDBStorage") UserStorage us,
-            LikeDBStorage ls) {
+                           LikeDBStorage ls) {
         this.fs = fs;
         this.us = us;
         this.ls = ls;
@@ -83,5 +84,15 @@ public class FilmServiceImpl implements FilmService {
     public List<FilmDTO> readTopFilms(Long count) {
         log.debug("Получен список из {} Film по кол-ву Likes.", count);
         return FilmMapper.listFilmsToListDto(fs.getTopFilms(count));
+    }
+
+    @Override
+    public List<FilmDTO> getSortedFilms(Long id, String sortBy) {
+        List<FilmDTO> sortedFilms = FilmMapper.listFilmsToListDto(fs.getSortedFilms(id, sortBy));
+        log.debug("Получен список фильмов режиссера с ID {}, отсортированный по кол-ву лайков или годам", id);
+        if (sortedFilms.isEmpty()) {
+            throw new EntityNotFoundException("Режиссер с id: " + id + " не найден");
+        }
+        return sortedFilms;
     }
 }

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.validation;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -65,4 +66,11 @@ public class Validator {
         return true;
     }
 
+    public static boolean directorValidator(Director director) {
+        if (director.getName() == null || director.getName().isBlank()) {
+            log.debug("Director name is Blanc");
+            throw new ValidationException("Director name is Blanc");
+        }
+        return true;
+    }
 }
