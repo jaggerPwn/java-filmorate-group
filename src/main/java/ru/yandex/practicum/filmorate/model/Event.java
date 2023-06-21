@@ -25,8 +25,8 @@ public class Event {
         Map<String, Object> temp = new HashMap<>();
         temp.put("userId", userId);
         temp.put("timestamp", timestamp);
-        temp.put("eventType", eventType);
-        temp.put("operation", operation);
+        temp.put("eventType", eventType.name());
+        temp.put("operation", operation.name());
         temp.put("entityId", entityId);
         return temp;
     }
