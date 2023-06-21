@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.EventDTO;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -17,10 +19,12 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final FeedService feedService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FeedService feedService) {
         this.userService = userService;
+        this.feedService = feedService;
     }
 
     @PostMapping
@@ -88,4 +92,9 @@ public class UserController {
         return new ResponseEntity<>(userService.findRecommendation(id), HttpStatus.OK);
     }
 
+    @GetMapping("/{id}/feed")
+    public ResponseEntity<List<EventDTO>> getFeed (@PathVariable(value = "id") Long id){
+        log.info("Получен GET запрос по эндпоинту '/users/{}/feed' на получение ленты событий Юзера", id);
+        return new ResponseEntity<>(feedService.getFeed(id), HttpStatus.OK);
+    }
 }
