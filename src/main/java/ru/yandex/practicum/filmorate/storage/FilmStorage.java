@@ -16,5 +16,6 @@ public interface FilmStorage {
     Film getFilmById(Long id);
 
     Set<Film> getTopFilms(Long count);
-
+    public List<Film> searchFilm(String query, String by);
+    public List<Film> topFilms();
 }

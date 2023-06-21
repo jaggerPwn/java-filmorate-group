@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -16,6 +18,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component("filmDBStorage")
@@ -131,4 +134,59 @@ public class FilmDBStorage implements FilmStorage {
                 .build();
     }
 
+
+    public List<Film> searchFilmForDirector(String queryStr){
+        String query = "SELECT * FROM FILMS " +
+                "LEFT JOIN FILMDIRECTORS ON FILMDIRECTORS.FILMID = films.ID " +
+                "LEFT JOIN DIRECTORS ON DIRECTORS.ID = FILMDIRECTORS.DIRECTORID " +
+                "WHERE DIRECTORS.NAME LIKE ?";
+        List<Film> films = jdbcTemplate.query(query, this::mapToFilm, "%" + queryStr + "%");
+        log.debug("Получены все Film по имени режиссёра");
+        return films;
+    }
+
+    public List<Film> searchFilmForTitle(String queryStr){
+        String query = "SELECT * FROM FILMS " +
+                "WHERE FILMS.NAME  LIKE ?";
+        List<Film> films = jdbcTemplate.query(query, this::mapToFilm, "%" + queryStr + "%");
+        log.debug("Получены все Film по названию");
+        return films;
+    }
+
+    public List<Film> searchFilmForTitleAndDirector(String queryStr){
+        String query = "SELECT * FROM FILMS " +
+                "LEFT JOIN FILMDIRECTORS ON FILMDIRECTORS.FILMID = films.ID " +
+                "LEFT JOIN DIRECTORS ON DIRECTORS.ID = FILMDIRECTORS.DIRECTORID " +
+                "WHERE DIRECTORS.NAME LIKE ? OR FILMS.NAME  LIKE ?";
+        List<Film> films = jdbcTemplate.query(query, this::mapToFilm, "%" + queryStr + "%" ,"%" + queryStr + "%");
+        log.debug("Получены все Film по названию и режиссёру");
+        return films;
+    }
+
+    public List<Film> searchFilm(String query, String by){
+        List<Film> films = null;
+        if(query == null){
+            return null;
+        }
+        if(by.contains("director") && by.contains("title")){
+            films = searchFilmForTitleAndDirector(query);
+        } else if (by.contains("director") && (!by.contains("title"))) {
+            films = searchFilmForDirector(query);
+        } else if (by.contains("title")) {
+            films = searchFilmForTitle(query);
+        }
+        return films;
+    }
+
+    public List<Film> topFilms(){
+        String query = "Select f.id, f.name, f.description, f.releaseDate, f.duration, f.mpaid " +
+                "FROM films f " +
+                "LEFT JOIN filmgenres fg ON f.id = filmid " +
+                "LEFT JOIN genres g ON fg.genreid = g.id " +
+                "LEFT JOIN likes l ON f.id = l.filmid " +
+                "GROUP BY f.id " +
+                "ORDER BY count(l.userid) DESC";
+        log.debug("Получены все Film по рейтингу");
+        return jdbcTemplate.query(query, this::mapToFilm);
+    }
 }

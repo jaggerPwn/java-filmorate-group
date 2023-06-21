@@ -58,4 +58,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Set<Film> getTopFilms(Long count) {
         return null;
     }
+
+    @Override
+    public List<Film> searchFilm(String query, String by) {
+        return null;
+    }
+
+    @Override
+    public List<Film> topFilms() {
+        return null;
+    }
+
+
 }

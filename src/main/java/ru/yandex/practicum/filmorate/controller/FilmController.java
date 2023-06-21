@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDTO;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -64,6 +65,19 @@ public class FilmController {
     public ResponseEntity<FilmDTO> getFilmById(@PathVariable Long filmId) {
         log.info("Получен GET запрос по эндпоинту '/films/{filmId}' на получение фильма по ID");
         return new ResponseEntity<>(service.getFilmByID(filmId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "search", params = {"query", "by"})
+    public ResponseEntity<List<FilmDTO>> searchFilmForDirector(@RequestParam("query") String query,
+                                                               @RequestParam(value = "by", defaultValue = "title") String by){
+
+        return new ResponseEntity<>(service.searchFilm(query,by), HttpStatus.OK);
+    }
+
+    @GetMapping("search")
+    public ResponseEntity<List<FilmDTO>> getAllFilms() {
+        // ваш код для получения списка всех фильмов
+        return new ResponseEntity<>(service.topFilms(), HttpStatus.OK);
     }
 
 }

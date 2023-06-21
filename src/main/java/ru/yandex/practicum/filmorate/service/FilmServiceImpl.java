@@ -84,4 +84,16 @@ public class FilmServiceImpl implements FilmService {
         log.debug("Получен список из {} Film по кол-ву Likes.", count);
         return FilmMapper.listFilmsToListDto(fs.getTopFilms(count));
     }
+
+
+    public List<FilmDTO> searchFilm(String query, String by){
+        if(query == null){
+            return FilmMapper.listFilmsToListDto(fs.topFilms());
+        }
+        return FilmMapper.listFilmsToListDto(fs.searchFilm(query,by));
+    }
+
+    public List<FilmDTO> topFilms(){
+        return FilmMapper.listFilmsToListDto(fs.topFilms());
+    }
 }
