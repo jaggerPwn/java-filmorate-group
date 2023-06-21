@@ -20,6 +20,10 @@ public interface FilmService {
 
     List<FilmDTO> readTopFilms(Long count);
 
+    void deleteFilm(Long id);
+
+    List<FilmDTO> getCommonFilms (Long userId, Long friendId);
+
     List<FilmDTO> getSortedFilms(Long id, String sortBy);
 
 }

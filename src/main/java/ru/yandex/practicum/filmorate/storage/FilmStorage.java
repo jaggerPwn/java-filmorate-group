@@ -17,6 +17,10 @@ public interface FilmStorage {
 
     Set<Film> getTopFilms(Long count);
 
+    List<Film> getCommonFilms (Long userId, Long friendId);
+
+    void deleteFilm(Long id);
+
     List<Film> getSortedFilms(Long id, String sortBy);
 
 }

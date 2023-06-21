@@ -87,6 +87,16 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
+    public List<FilmDTO> getCommonFilms(Long userId, Long friendId) {
+        return FilmMapper.listFilmsToListDto(fs.getCommonFilms(userId,friendId));
+    }
+
+    @Override
+    public void deleteFilm(Long id) {
+        fs.deleteFilm(id);
+    }
+
+    @Override
     public List<FilmDTO> getSortedFilms(Long id, String sortBy) {
         List<FilmDTO> sortedFilms = FilmMapper.listFilmsToListDto(fs.getSortedFilms(id, sortBy));
         log.debug("Получен список фильмов режиссера с ID {}, отсортированный по кол-ву лайков или годам", id);

@@ -42,7 +42,8 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public Film saveFilm(Film film) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("films").usingGeneratedKeyColumns("id");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("films")
+                .usingGeneratedKeyColumns("id");
         Number key = simpleJdbcInsert.executeAndReturnKey(film.filmToMap());
         film.setId((Long) key);
         film.setMpa(mpaDBStorage.readById(film.getMpa().getId()));
@@ -53,6 +54,7 @@ public class FilmDBStorage implements FilmStorage {
                 jdbcTemplate.update(query, film.getId(), genre.getId());
             }
         }
+        film.setGenres(genreStorage.getGenresByFilmID(film.getId()));
 
         updateDirector(film);
         log.debug("Film c ID {} сохранён.", film.getId());
@@ -64,8 +66,10 @@ public class FilmDBStorage implements FilmStorage {
         if (film == null) {
             throw new ValidationException("Film не найден");
         }
-        String sqlQuery = "UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ?, mpaid = ? WHERE id = ?";
-        if (jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId()) != 0) {
+        String sqlQuery
+                = "UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ?, mpaid = ? WHERE id = ?";
+        if (jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(),
+                film.getDuration(), film.getMpa().getId(), film.getId()) != 0) {
             log.info("Film c id {} обновлён", film.getId());
         } else {
             throw new EntityNotFoundException("Film с таким id не существует");
@@ -185,6 +189,31 @@ public class FilmDBStorage implements FilmStorage {
                 .genres(genreStorage.getGenresByFilmID(rs.getLong("id")))
                 .directors(directorStorage.getDirectorsByFilmId(rs.getLong("id")))
                 .build();
+    }
+
+    @Override
+    public void deleteFilm(Long id) {
+        String query = "DELETE FROM films WHERE id = ?";
+        if (jdbcTemplate.update(query, id) != 0) {
+            log.info("Film с Id {} удалён.", id);
+        } else {
+            log.info("Film с Id {} не найден.", id);
+        }
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) { //TODO прогнать тесты в Postman
+
+        String query = "SELECT * FROM films f "
+                + "LEFT JOIN likes l1 ON f.id = l1.filmid "
+                + "LEFT JOIN likes l2 ON f.id = l2.filmid "
+                + "WHERE l1.userId =? AND l2.userId =? "
+                + "GROUP BY f.id "
+                + "ORDER BY count (l1.userId) DESC";
+
+        List<Film> commonFilms = jdbcTemplate.query(query, this::mapToFilm, userId, friendId);
+        log.debug("Получены фильмы общие у Users userId {} и friend id {}.", userId, friendId);
+        return commonFilms;
     }
 
 }
