@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
@@ -24,16 +23,14 @@ import java.util.*;
 public class FilmDBStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final MpaDBStorage mpaDBStorage;
     private final GenreStorage genreStorage;
     private final LikeDBStorage likeDBStorage;
     private final DirectorStorage directorStorage;
 
     @Autowired
-    public FilmDBStorage(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate, MpaDBStorage mpaDBStorage, GenreStorage genreStorage, LikeDBStorage likeDBStorage, DirectorStorage directorStorage) {
+    public FilmDBStorage(JdbcTemplate jdbcTemplate, MpaDBStorage mpaDBStorage, GenreStorage genreStorage, LikeDBStorage likeDBStorage, DirectorStorage directorStorage) {
         this.jdbcTemplate = jdbcTemplate;
-        this.namedJdbcTemplate = namedJdbcTemplate;
         this.mpaDBStorage = mpaDBStorage;
         this.genreStorage = genreStorage;
         this.likeDBStorage = likeDBStorage;

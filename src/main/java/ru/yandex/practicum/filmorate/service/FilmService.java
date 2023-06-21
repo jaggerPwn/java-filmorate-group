@@ -22,7 +22,7 @@ public interface FilmService {
 
     void deleteFilm(Long id);
 
-    List<FilmDTO> getCommonFilms (Long userId, Long friendId);
+    List<FilmDTO> getCommonFilms(Long userId, Long friendId);
 
     List<FilmDTO> getSortedFilms(Long id, String sortBy);
 
