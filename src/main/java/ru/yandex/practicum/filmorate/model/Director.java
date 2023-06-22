@@ -15,7 +15,6 @@ import java.util.Map;
 @NoArgsConstructor
 public class Director {
     private Long id;
-    @NotBlank(message = "Director name can't be blank")
     private String name;
 
     public Map<String, Object> directorToMap() {

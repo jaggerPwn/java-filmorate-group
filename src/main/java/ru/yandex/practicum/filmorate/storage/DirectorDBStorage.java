@@ -4,17 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -35,50 +32,42 @@ public class DirectorDBStorage implements DirectorStorage {
 
     @Override
     public Director updateDirector(Director director) {
-        if (director == null || director.getId() == null) {
-            throw new ValidationException("Невалидный Director");
-        }
         String sqlQuery = "UPDATE directors SET name = ? WHERE directorid = ?";
         if (jdbcTemplate.update(sqlQuery, director.getName(), director.getId()) != 0) {
             log.debug("Director {} успешно обновлён", director.getId());
             return director;
         } else {
+            log.debug("Director {} не обновлён", director.getId());
             throw new EntityNotFoundException("Director с таким id не найден");
         }
     }
 
     @Override
     public List<Director> readAllDirectors() {
-        String sqlQuery = "SELECT * FROM directors";
         log.debug("Все Director получены");
-        return jdbcTemplate.query(sqlQuery, this::mapToDirector);
+        return jdbcTemplate.query("SELECT * FROM directors", this::mapToDirector);
     }
 
     @Override
-    public Optional<Director> getDirectorById(Long id) {
+    public Director getDirectorById(Long id) {
         String sqlQuery = "SELECT * FROM directors WHERE directorid = ?";
-        SqlRowSet directorRow = jdbcTemplate.queryForRowSet(sqlQuery, id);
-        if (directorRow.next()) {
-            Director director = Director.builder()
-                    .id(directorRow.getLong("directorid"))
-                    .name(directorRow.getString("name"))
-                    .build();
-            log.debug("Получен Director с ID {}, по имени {} ", directorRow.getLong("directorid"),
-                    directorRow.getString("name"));
-            return Optional.of(director);
-        } else {
-            log.debug("Director с ID: {} не найден", id);
-            return Optional.empty();
+        try {
+            Director director = jdbcTemplate.queryForObject(sqlQuery, this::mapToDirector, id);
+            log.debug("Director с ID {} получен.", id);
+            return director;
+        } catch (Throwable throwable) {
+            throw new EntityNotFoundException("Director с таким id не найден");
         }
     }
 
     @Override
-    public Director deleteDirectorById(Long id) {
+    public void deleteDirectorById(Long id) {
         String sqlQuery = "DELETE FROM directors WHERE directorid = ?";
-        Optional<Director> director = getDirectorById(id);
-        jdbcTemplate.update(sqlQuery, id);
-        log.debug("Director с ID {} удален", id);
-        return director.orElse(null);
+        if (jdbcTemplate.update(sqlQuery, id) != 0) {
+            log.info("Director с Id {} удалён.", id);
+        } else {
+            log.info("Director с Id {} не найден.", id);
+        }
     }
 
     public Director mapToDirector(ResultSet rs, int rowNum) throws SQLException {

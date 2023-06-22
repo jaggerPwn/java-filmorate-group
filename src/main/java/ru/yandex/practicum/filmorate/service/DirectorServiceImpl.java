@@ -5,12 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.DirectorDTO;
-import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
-import ru.yandex.practicum.filmorate.validation.Validator;
+
 
 import java.util.List;
 
@@ -27,21 +25,17 @@ public class DirectorServiceImpl implements DirectorService {
     @Override
     public DirectorDTO saveDirector(DirectorDTO directorDTO) {
         Director director = DirectorMapper.dtoToDirector(directorDTO);
-        if (Validator.directorValidator(director)) {
-            log.debug("Director c ID {} сохранён.", directorDTO.getId());
-            return DirectorMapper.directorToDTO(ds.saveDirector(director));
-        }
-        throw new ValidationException("Валидация Director " + directorDTO + "  не пройдена.");
+        DirectorDTO dirDTO = DirectorMapper.directorToDTO(ds.saveDirector(director));
+        log.debug("Director c ID {} сохранён.", directorDTO.getId());
+        return dirDTO;
     }
 
     @Override
     public DirectorDTO updateDirector(DirectorDTO directorDTO) {
         Director director = DirectorMapper.dtoToDirector(directorDTO);
-        if (Validator.directorValidator(director)) {
-            log.debug("Director c ID {} обновлен.", directorDTO.getId());
-            return DirectorMapper.directorToDTO(ds.updateDirector(director));
-        }
-        throw new ValidationException("Валидация Director " + directorDTO + "  не пройдена.");
+        DirectorDTO dirDTO = DirectorMapper.directorToDTO(ds.updateDirector(director));
+        log.debug("Director c ID {} обновлен.", directorDTO.getId());
+        return dirDTO;
     }
 
     @Override
@@ -53,8 +47,7 @@ public class DirectorServiceImpl implements DirectorService {
     @Override
     public DirectorDTO getDirectorById(Long id) {
         log.debug("Director c ID c {} получен.", id);
-        return DirectorMapper.directorToDTO(ds.getDirectorById(id).orElseThrow(() ->
-                new EntityNotFoundException(String.format("Director c id = %d не найден", id))));
+        return DirectorMapper.directorToDTO(ds.getDirectorById(id));
     }
 
     @Override

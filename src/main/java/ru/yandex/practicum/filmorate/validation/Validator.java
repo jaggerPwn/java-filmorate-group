@@ -65,12 +65,5 @@ public class Validator {
         log.debug("User validation is successful");
         return true;
     }
-
-    public static boolean directorValidator(Director director) {
-        if (director.getName() == null || director.getName().isBlank()) {
-            log.debug("Director name is Blank");
-            throw new ValidationException("Director name is Blank");
-        }
-        return true;
-    }
+    
 }

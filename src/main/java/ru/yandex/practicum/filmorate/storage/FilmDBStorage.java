@@ -154,6 +154,7 @@ public class FilmDBStorage implements FilmStorage {
         } else {
             throw new EntityNotFoundException("Некорректный запрос");
         }
+        log.debug("Получен отсортированный список фильмов по кол-ву likes или releaseDate по ID director {}", id);
         return films;
     }
 

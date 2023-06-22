@@ -560,7 +560,7 @@ class FilmorateApplicationTests {
                 .name("Братья (Сестры) Вачовски")
                 .build();
         directorDBStorage.saveDirector(director);
-        Assertions.assertEquals(director, directorDBStorage.getDirectorById(1L).get(), "Ожидался корректный Director");
+        Assertions.assertEquals(director, directorDBStorage.getDirectorById(1L), "Ожидался корректный Director");
     }
 
     @DisplayName("Тест обновления существующего Director")
@@ -573,7 +573,7 @@ class FilmorateApplicationTests {
         directorDBStorage.saveDirector(director);
         director.setName("Спилберг");
         directorDBStorage.updateDirector(director);
-        Assertions.assertEquals(director, directorDBStorage.getDirectorById(1L).get(), "Ожидался коректный Director");
+        Assertions.assertEquals(director, directorDBStorage.getDirectorById(1L), "Ожидался коректный Director");
     }
 
     @DisplayName("Тест получения всех Directors")
@@ -600,7 +600,7 @@ class FilmorateApplicationTests {
                 .name("Братья (Сестры) Вачовски")
                 .build();
         directorDBStorage.saveDirector(director);
-        Assertions.assertEquals(director, directorDBStorage.getDirectorById(1L).get(), "Ожидался коректный Director");
+        Assertions.assertEquals(director, directorDBStorage.getDirectorById(1L), "Ожидался коректный Director");
     }
 
     @DisplayName("Тест удаления Director по ID")
