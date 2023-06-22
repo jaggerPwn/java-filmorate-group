@@ -61,7 +61,7 @@ public class ReviewController {
             @PathVariable Long userId) {
         log.info(String.format("Получен PUT запрос по эндпоинту '/reviews/:reviewId/like/:userId' " +
                 "на лайк поста %d юзером%d", reviewId, userId));
-        reviewService.addReviewLike(reviewId, userId);
+        reviewService.addReviewLike(reviewId, userId, true);
     }
 
     @PutMapping("/{reviewId}/dislike/{userId}")
@@ -70,7 +70,7 @@ public class ReviewController {
             @PathVariable Long userId) {
         log.info(String.format("Получен PUT запрос по эндпоинту '/reviews/:reviewId/like/:userId' " +
                 "на DISлайк поста %d юзером%d", reviewId, userId));
-        reviewService.addReviewDislike(reviewId, userId);
+        reviewService.addReviewLike(reviewId, userId, false);
     }
 
 }

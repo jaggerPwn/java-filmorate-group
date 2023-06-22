@@ -45,20 +45,11 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void addReviewLike(Long reviewId, Long userId) {
+    public void addReviewLike(Long reviewId, Long userId, boolean positive) {
         Review review = this.rs.getReviewById(reviewId);
         UserDTO user = us.getUserById(userId);
         Validator.validateForGrade(review, user);
-        review.addLike(userId, true);
-        rs.saveReviewLikes(review);
-    }
-
-    @Override
-    public void addReviewDislike(Long reviewId, Long userId) {
-        Review review = this.rs.getReviewById(reviewId);
-        UserDTO user = us.getUserById(userId);
-        Validator.validateForGrade(review, user);
-        review.addLike(userId, false);
+        review.addLike(userId, positive);
         rs.saveReviewLikes(review);
     }
 
