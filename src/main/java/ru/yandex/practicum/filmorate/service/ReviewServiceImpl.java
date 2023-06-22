@@ -49,8 +49,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = this.rs.getReviewById(reviewId);
         UserDTO user = us.getUserById(userId);
         Validator.validateForGrade(review, user);
-        review.addLike(userId, positive);
-        rs.saveReviewLikes(review);
+        rs.saveReviewLikes(reviewId, userId, positive);
     }
 
     @Override

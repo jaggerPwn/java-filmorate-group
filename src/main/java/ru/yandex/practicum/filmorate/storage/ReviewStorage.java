@@ -16,7 +16,5 @@ public interface ReviewStorage {
 
     void deleteReviewById(Long id);
 
-    void loadReviewLikes(Review review);
-
-    void saveReviewLikes(Review review);
+    void saveReviewLikes(Long reviewId, Long userId, boolean positive);
 }

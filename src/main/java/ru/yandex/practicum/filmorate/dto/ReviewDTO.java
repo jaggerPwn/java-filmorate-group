@@ -5,8 +5,6 @@ import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @Data
 @Builder
@@ -20,7 +18,4 @@ public class ReviewDTO {
     private Long filmId;
     @JsonProperty(value = "useful")
     private int useful;
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private final Map<Long, Boolean> reviewLikes = new HashMap<>();
 }

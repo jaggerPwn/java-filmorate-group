@@ -7,7 +7,6 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -17,10 +16,7 @@ import ru.yandex.practicum.filmorate.validation.Validator;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -82,11 +78,11 @@ public class ReviewDbStorage implements ReviewStorage {
                     "r.ISPOSITIVE,\n" +
                     "r.USERID,\n" +
                     "r.FILMID, \n" +
-                    "COUNT(NULLIF(POSITIVE, false)) p\n" +
+                    "COUNT(NULLIF(POSITIVE, false))-COUNT(NULLIF(POSITIVE,true)) useful\n" +
                     "FROM PUBLIC.REVIEWS r\n" +
                     "LEFT JOIN REVIEWLIKES rl ON rl.REVIEWID = r.ID\n" +
                     "GROUP BY R.ID\n" +
-                    "ORDER BY p desc\n" +
+                    "ORDER BY useful desc\n" +
                     "LIMIT ?;";
             reviews = jdbcTemplate.query(sqlQuery, ReviewDbStorage::mapToReview, count);
         } else {
@@ -95,41 +91,25 @@ public class ReviewDbStorage implements ReviewStorage {
                     "r.ISPOSITIVE,\n" +
                     "r.USERID,\n" +
                     "r.FILMID, \n" +
-                    "COUNT(NULLIF(POSITIVE, false)) p\n" +
+                    "COUNT(NULLIF(POSITIVE, false))-COUNT(NULLIF(POSITIVE,true)) useful\n" +
                     "FROM PUBLIC.REVIEWS r\n" +
                     "LEFT JOIN REVIEWLIKES rl ON rl.REVIEWID = r.ID\n" +
                     "WHERE FILMID = ?\n" +
                     "GROUP BY R.ID\n" +
-                    "ORDER BY p desc\n" +
+                    "ORDER BY useful desc\n" +
                     "LIMIT ?;";
             reviews = jdbcTemplate.query(sqlQuery, ReviewDbStorage::mapToReview, filmId, count);
         }
-        reviews.forEach(this::loadReviewLikes);
-        return reviews.stream()
-                .sorted(Comparator.comparing(Review::getUsefulRate).reversed())
-                .collect(Collectors.toList());
-    }
-
-    public void loadReviewLikes(Review review) {
-        String sql = "SELECT * FROM REVIEWLIKES WHERE  REVIEWID = ?";
-        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, review.getReviewId());
-        while (sqlRowSet.next()) {
-            long userid = sqlRowSet.getLong("USERID");
-            boolean positive = sqlRowSet.getBoolean("POSITIVE");
-            review.addLike(userid, positive);
-        }
-        review.setUseful(review.getUsefulRate());
+        return reviews;
     }
 
     @Override
-    public void saveReviewLikes(Review review) {
+    public void saveReviewLikes(Long reviewId, Long userId, boolean positive) {
         String sql = "DELETE FROM REVIEWLIKES WHERE REVIEWID = ?";
-        jdbcTemplate.update(sql, review.getReviewId());
+        jdbcTemplate.update(sql, reviewId);
         sql = "INSERT INTO reviewLikes (REVIEWID, USERID, POSITIVE) VALUES(?, ?, ?)";
-        Map<Long, Boolean> reviewLikes = review.getReviewlikes();
-        for (var grade : reviewLikes.entrySet()) {
-            jdbcTemplate.update(sql, review.getReviewId(), grade.getKey(), grade.getValue());
-        }
+        jdbcTemplate.update(sql, reviewId, userId, positive);
+
     }
 
     @Override
@@ -151,13 +131,18 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     public static Review mapToReview(ResultSet resultSet, int i) throws SQLException {
-        return Review.builder()
+        Review build = Review.builder()
                 .reviewId(resultSet.getLong("id"))
                 .content(resultSet.getString("content"))
                 .filmId(resultSet.getLong("filmId"))
                 .userId(resultSet.getLong("userId"))
                 .isPositive(resultSet.getBoolean("isPositive"))
                 .build();
+        try {
+            build.setUseful(resultSet.getInt("useful"));
+        } catch (SQLException ignored) {
+        }
+        return build;
 
     }
 }
