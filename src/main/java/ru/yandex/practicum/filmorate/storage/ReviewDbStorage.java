@@ -82,7 +82,7 @@ public class ReviewDbStorage implements ReviewStorage {
                     "r.ISPOSITIVE,\n" +
                     "r.USERID,\n" +
                     "r.FILMID, \n" +
-                    "COUNT(POSITIVE) p\n" +
+                    "COUNT(NULLIF(POSITIVE, false)) p\n" +
                     "FROM PUBLIC.REVIEWS r\n" +
                     "LEFT JOIN REVIEWLIKES rl ON rl.REVIEWID = r.ID\n" +
                     "GROUP BY R.ID\n" +
@@ -95,7 +95,7 @@ public class ReviewDbStorage implements ReviewStorage {
                     "r.ISPOSITIVE,\n" +
                     "r.USERID,\n" +
                     "r.FILMID, \n" +
-                    "COUNT(POSITIVE) p\n" +
+                    "COUNT(NULLIF(POSITIVE, false)) p\n" +
                     "FROM PUBLIC.REVIEWS r\n" +
                     "LEFT JOIN REVIEWLIKES rl ON rl.REVIEWID = r.ID\n" +
                     "WHERE FILMID = ?\n" +
