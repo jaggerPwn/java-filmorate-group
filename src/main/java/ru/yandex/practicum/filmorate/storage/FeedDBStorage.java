@@ -24,9 +24,9 @@ public class FeedDBStorage implements FeedStorage {
 
     @Override
     public List<Event> getFeed(long id) {
-        String sql = "SELECT *" +
-                "FROM feed as f" +
-                "WHERE user_id = ?;";
+        String sql = "SELECT * " +
+                "FROM feed " +
+                "WHERE userid = ?;";
         return jdbcTemplate.query(sql, this::mapToEvent, id);
     }
 
@@ -43,11 +43,11 @@ public class FeedDBStorage implements FeedStorage {
     private Event mapToEvent(ResultSet rs, int rowNum) throws SQLException{
         return Event.builder()
                 .id(rs.getLong("id"))
-                .userId(rs.getLong("user_id"))
+                .userId(rs.getLong("userid"))
                 .timestamp(rs.getLong("timestamp"))
-                .eventType(EventType.valueOf(rs.getString("event_type")))
+                .eventType(EventType.valueOf(rs.getString("eventType")))
                 .operation(Operation.valueOf(rs.getString("operation")))
-                .entityId(rs.getLong("entity_id"))
+                .entityId(rs.getLong("entityId"))
                 .build();
     }
 }
