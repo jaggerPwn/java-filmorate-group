@@ -23,16 +23,4 @@ public class ReviewDTO {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private final Map<Long, Boolean> reviewLikes = new HashMap<>();
-
-    public int getLike() {
-        int like = 0;
-        for (var positive : reviewLikes.values()) {
-            if (positive) {
-                like++;
-            } else {
-                like--;
-            }
-        }
-        return like;
-    }
 }

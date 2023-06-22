@@ -87,11 +87,10 @@ public class ReviewDbStorage implements ReviewStorage {
         }
         reviews.forEach(this::loadReviewLikes);
         return reviews.stream()
-                .sorted(Comparator.comparing(Review::getUsefulFromReviewLikesMap).reversed())
+                .sorted(Comparator.comparing(Review::getUsefulRate).reversed())
                 .collect(Collectors.toList());
     }
 
-    @Override
     public void loadReviewLikes(Review review) {
         String sql = "SELECT * FROM REVIEWLIKES WHERE  REVIEWID = ?";
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, review.getReviewId());
@@ -100,7 +99,7 @@ public class ReviewDbStorage implements ReviewStorage {
             boolean positive = sqlRowSet.getBoolean("POSITIVE");
             review.addLike(userid, positive);
         }
-        review.setUseful(review.getUsefulFromReviewLikesMap());
+        review.setUseful(review.getUsefulRate());
     }
 
     @Override

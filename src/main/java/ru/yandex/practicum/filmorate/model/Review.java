@@ -20,7 +20,7 @@ public class Review {
     private int useful;
     private final Map<Long, Boolean> reviewlikes = new HashMap<>();
 
-    public int getUsefulFromReviewLikesMap() {
+    public int getUsefulRate() {
         int useful = 0;
         for (var positive : reviewlikes.values()) {
             if (positive) {
