@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteFriendById(Long idUser, Long idFriend) {
         us.userDeleteFriend(idUser, idFriend);
-        log.debug("Дружба между User c ID {} и User с ID {} аннулирована.", idUser,idFriend);
+        log.debug("Дружба между User c ID {} и User с ID {} аннулирована.", idUser, idFriend);
     }
 
     @Override
@@ -90,6 +90,11 @@ public class UserServiceImpl implements UserService {
         ids.retainAll(us.getUserById(idUser2).getFriends());
         log.debug("Возвращён список общих друзей у User с ID {} и User c ID {}.", idUser1, idUser2);
         return ids.stream().map(us::getUserById).map(UserMapper::userToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        us.deleteUser(id);
     }
 
 }

@@ -149,20 +149,22 @@ class FilmorateApplicationTests {
         Assertions.assertEquals(user, userDBStorage.getUserById(1L), "Ожидался коррктный User");
     }
 
-//    @Test
-//    public void deleteUserTest(){
-//        User user = User.builder()
-//                .id(1L)
-//                .name("123")
-//                .email("123@asd.ru")
-//                .login("Tert")
-//                .birthday(LocalDate.of(1988, 5, 29))
-//                .friends(new HashSet<>())
-//                .build();
-//        userDBStorage.saveUser(user);
-//        Assertions.assertEquals(1,userDBStorage.readAllUsers().size());
-//        userDBStorage.
-//    }
+    @DisplayName("Тест DELETE существующего User по ID")
+    @Test
+    public void deleteUserTest(){
+        User user = User.builder()
+                .id(1L)
+                .name("123")
+                .email("123@asd.ru")
+                .login("Tert")
+                .birthday(LocalDate.of(1988, 5, 29))
+                .friends(new HashSet<>())
+                .build();
+        userDBStorage.saveUser(user);
+        Assertions.assertEquals(1,userDBStorage.readAllUsers().size());
+        userDBStorage.deleteUser(user.getId());
+        Assertions.assertEquals(0,userDBStorage.readAllUsers().size());
+    }
 
     @DisplayName("Тест получения всех существующих User")
     @Test
@@ -272,6 +274,24 @@ class FilmorateApplicationTests {
         Assertions.assertEquals(film, filmDBStorage.getFilmById(1L), "Ожидались коррктный Film с конкретным id");
     }
 
+    @DisplayName("Тест DELETE существующего Film по ID")
+    @Test
+    public void deleteFilmTest(){
+        Film film = Film.builder()
+                .id(1L)
+                .name("Snatch")
+                .description("Cool film")
+                .releaseDate(LocalDate.of(2000, 8, 23))
+                .duration(120)
+                .genres(Set.of(new Genre(1, "Комедия")))
+                .likes(new HashSet<>())
+                .mpa(new Mpa(4, "R"))
+                .build();
+        filmDBStorage.saveFilm(film);
+        Assertions.assertEquals(1,filmDBStorage.readAllFilms().size());
+        filmDBStorage.deleteFilm(film.getId());
+        Assertions.assertEquals(0,filmDBStorage.readAllFilms().size());
+    }
 
     //ТЕСТЫ LIKES
 
@@ -380,6 +400,61 @@ class FilmorateApplicationTests {
                 "всех существующих Like у Film с конкретным id");
     }
 
+    @DisplayName("Тест получения Common films у двух User")
+    @Test
+    public void getCommonFilmsTestByUsersId() {
+        Film film = Film.builder()
+                .id(1L)
+                .name("Snatch")
+                .description("Cool film")
+                .releaseDate(LocalDate.of(2000, 8, 23))
+                .duration(120)
+                .genres(Set.of(new Genre(1, "Комедия")))
+                .likes(new HashSet<>())
+                .mpa(new Mpa(4, "R"))
+                .build();
+        filmDBStorage.saveFilm(film);
+
+        Film film2 = Film.builder()
+                .id(2L)
+                .name("The Big Lebowski")
+                .description("Cool film")
+                .releaseDate(LocalDate.of(1998, 1, 18))
+                .duration(120)
+                .genres(Set.of(new Genre(1, "Комедия")))
+                .likes(new HashSet<>())
+                .mpa(new Mpa(4, "R"))
+                .build();
+        filmDBStorage.saveFilm(film2);
+
+        User user = User.builder()
+                .id(1L)
+                .name("Andrey")
+                .email("ak@aknaz.ru")
+                .login("AKnaz")
+                .birthday(LocalDate.of(1988, 5, 29))
+                .friends(new HashSet<>())
+                .build();
+        userDBStorage.saveUser(user);
+        likeDBStorage.addLike(1L, 1L);
+        likeDBStorage.addLike(2L, 1L);
+
+        User user2 = User.builder()
+                .id(2L)
+                .name("Pavel")
+                .email("pavel@yandex.ru")
+                .login("pasHtetKING")
+                .birthday(LocalDate.of(1999, 8, 12))
+                .friends(new HashSet<>())
+                .build();
+        userDBStorage.saveUser(user2);
+        likeDBStorage.addLike(1L, 2L);
+
+        Film [] expected = {filmDBStorage.getFilmById(1L)};
+        Assertions.assertArrayEquals(expected, filmDBStorage.getCommonFilms(1L,2L).toArray(), "Ожидалось "
+                + "получение всех существующих Common Film у двух Users. ");
+    }
+
 
     //ТЕСТЫ FRIENDS
 
@@ -467,6 +542,7 @@ class FilmorateApplicationTests {
                 .birthday(LocalDate.of(1998, 6, 26))
                 .friends(new HashSet<>())
                 .build();
+
         userDBStorage.saveUser(user);
         userDBStorage.saveUser(friend);
         userDBStorage.saveUser(friend2);

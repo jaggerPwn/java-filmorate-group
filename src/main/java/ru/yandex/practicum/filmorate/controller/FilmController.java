@@ -66,4 +66,17 @@ public class FilmController {
         return new ResponseEntity<>(service.getFilmByID(filmId), HttpStatus.OK);
     }
 
+    @GetMapping("/common")
+    public ResponseEntity<List<FilmDTO>> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        log.info("Получен GET запрос по эндпоинту '/films/common' на получение общих фильмов у двух Users");
+        return new ResponseEntity<>(service.getCommonFilms(userId, friendId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{filmId}")
+    public ResponseEntity<?> deleteFilm(@PathVariable Long filmId) {
+        log.info("Получен DELETE запрос по эндпоинту '/films/{}' на удаление Film", filmId);
+        service.deleteFilm(filmId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

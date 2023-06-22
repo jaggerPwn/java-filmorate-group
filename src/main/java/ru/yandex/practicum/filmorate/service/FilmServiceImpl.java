@@ -84,4 +84,14 @@ public class FilmServiceImpl implements FilmService {
         log.debug("Получен список из {} Film по кол-ву Likes.", count);
         return FilmMapper.listFilmsToListDto(fs.getTopFilms(count));
     }
+
+    @Override
+    public List<FilmDTO> getCommonFilms(Long userId, Long friendId) {
+        return FilmMapper.listFilmsToListDto(fs.getCommonFilms(userId,friendId));
+    }
+
+    @Override
+    public void deleteFilm(Long id) {
+        fs.deleteFilm(id);
+    }
 }
