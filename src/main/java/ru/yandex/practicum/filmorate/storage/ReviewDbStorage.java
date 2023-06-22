@@ -52,6 +52,7 @@ public class ReviewDbStorage implements ReviewStorage {
             e.printStackTrace();
             throw new ValidationException("key not assigned");
         }
+        log.debug("Отзыв создан");
         return review;
     }
 
@@ -65,6 +66,7 @@ public class ReviewDbStorage implements ReviewStorage {
         } catch (DataAccessException e) {
             throw new EntityNotFoundException("review " + id + " not found");
         }
+        log.debug("Отзыв получен");
         return review;
     }
 
@@ -100,6 +102,7 @@ public class ReviewDbStorage implements ReviewStorage {
                     "LIMIT ?;";
             reviews = jdbcTemplate.query(sqlQuery, ReviewDbStorage::mapToReview, filmId, count);
         }
+        log.debug("Отзывы получены");
         return reviews;
     }
 
@@ -109,7 +112,7 @@ public class ReviewDbStorage implements ReviewStorage {
         jdbcTemplate.update(sql, reviewId);
         sql = "INSERT INTO reviewLikes (REVIEWID, USERID, POSITIVE) VALUES(?, ?, ?)";
         jdbcTemplate.update(sql, reviewId, userId, positive);
-
+        log.debug("Лайки сохранены");
     }
 
     @Override
@@ -120,7 +123,9 @@ public class ReviewDbStorage implements ReviewStorage {
                 "SET CONTENT = ?, ISPOSITIVE = ? \n" +
                 "WHERE ID = ?";
         jdbcTemplate.update(sqlQuery, review.getContent(), review.getIsPositive(), review.getReviewId());
-        return getReviewById(review.getReviewId());
+        Review reviewById = getReviewById(review.getReviewId());
+        log.debug("Отзыв обновлен");
+        return reviewById;
     }
 
 
@@ -128,6 +133,7 @@ public class ReviewDbStorage implements ReviewStorage {
     public void deleteReviewById(Long id) {
         String sqlQuery = "DELETE FROM PUBLIC.REVIEWS WHERE ID=?";
         jdbcTemplate.update(sqlQuery, id);
+        log.debug("Отзыв удален");
     }
 
     public static Review mapToReview(ResultSet resultSet, int i) throws SQLException {
