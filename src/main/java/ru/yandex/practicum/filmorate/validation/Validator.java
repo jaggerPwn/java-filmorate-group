@@ -76,10 +76,10 @@ public class Validator {
             throw new ValidationException("Review must have property content");
         }
         if (review.getUserId() == null) {
-            throw new ValidationException("ReviewID must not be null");
+            throw new ValidationException("UserId must not be null");
         }
         if (review.getUserId() < 0) {
-            throw new EntityNotFoundException("ReviewID must have property more then 0");
+            throw new EntityNotFoundException("UserId must have property more then 0");
         }
         if (review.getFilmId() == null) {
             throw new ValidationException("FILMID must not be null");

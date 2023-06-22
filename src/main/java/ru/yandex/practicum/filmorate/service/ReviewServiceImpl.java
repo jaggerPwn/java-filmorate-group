@@ -40,7 +40,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void deleteFilmById(Long filmId) {
+    public void deleteReviewById(Long filmId) {
         rs.deleteReviewById(filmId);
     }
 
@@ -54,7 +54,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void addReviewDISLike(Long reviewId, Long userId) {
+    public void addReviewDislike(Long reviewId, Long userId) {
         Review review = this.rs.getReviewById(reviewId);
         UserDTO user = us.getUserById(userId);
         Validator.validateForGrade(review, user);

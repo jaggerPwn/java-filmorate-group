@@ -8,10 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.service.ReviewService;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
@@ -31,7 +30,8 @@ class FilmorateApplicationTests {
     private final GenreDBStorage genreDBStorage;
     private final LikeDBStorage likeDBStorage;
     private final MpaDBStorage mpaDBStorage;
-
+    private final ReviewStorage reviewStorage;
+    private final ReviewService reviewService;
 
     //ТЕСТЫ GENRES
 
@@ -151,7 +151,7 @@ class FilmorateApplicationTests {
 
     @DisplayName("Тест DELETE существующего User по ID")
     @Test
-    public void deleteUserTest(){
+    public void deleteUserTest() {
         User user = User.builder()
                 .id(1L)
                 .name("123")
@@ -161,9 +161,9 @@ class FilmorateApplicationTests {
                 .friends(new HashSet<>())
                 .build();
         userDBStorage.saveUser(user);
-        Assertions.assertEquals(1,userDBStorage.readAllUsers().size());
+        Assertions.assertEquals(1, userDBStorage.readAllUsers().size());
         userDBStorage.deleteUser(user.getId());
-        Assertions.assertEquals(0,userDBStorage.readAllUsers().size());
+        Assertions.assertEquals(0, userDBStorage.readAllUsers().size());
     }
 
     @DisplayName("Тест получения всех существующих User")
@@ -276,7 +276,7 @@ class FilmorateApplicationTests {
 
     @DisplayName("Тест DELETE существующего Film по ID")
     @Test
-    public void deleteFilmTest(){
+    public void deleteFilmTest() {
         Film film = Film.builder()
                 .id(1L)
                 .name("Snatch")
@@ -288,9 +288,9 @@ class FilmorateApplicationTests {
                 .mpa(new Mpa(4, "R"))
                 .build();
         filmDBStorage.saveFilm(film);
-        Assertions.assertEquals(1,filmDBStorage.readAllFilms().size());
+        Assertions.assertEquals(1, filmDBStorage.readAllFilms().size());
         filmDBStorage.deleteFilm(film.getId());
-        Assertions.assertEquals(0,filmDBStorage.readAllFilms().size());
+        Assertions.assertEquals(0, filmDBStorage.readAllFilms().size());
     }
 
     //ТЕСТЫ LIKES
@@ -450,8 +450,8 @@ class FilmorateApplicationTests {
         userDBStorage.saveUser(user2);
         likeDBStorage.addLike(1L, 2L);
 
-        Film [] expected = {filmDBStorage.getFilmById(1L)};
-        Assertions.assertArrayEquals(expected, filmDBStorage.getCommonFilms(1L,2L).toArray(), "Ожидалось "
+        Film[] expected = {filmDBStorage.getFilmById(1L)};
+        Assertions.assertArrayEquals(expected, filmDBStorage.getCommonFilms(1L, 2L).toArray(), "Ожидалось "
                 + "получение всех существующих Common Film у двух Users. ");
     }
 
@@ -552,5 +552,168 @@ class FilmorateApplicationTests {
         Assertions.assertArrayEquals(expected, userDBStorage.getAllFriendByUserId(1L).toArray(), "Ожидалось получение " +
                 "всех friend у конкретного User");
     }
+
+    @DisplayName("Тест создания и получения ревью по ID")
+    @Test
+    public void getReviewById() {
+        createTwoUsersTwoFilm();
+        Review reviewtemp = Review.builder()
+                .content("очень хороший фильм")
+                .userId(1L)
+                .filmId(1L)
+                .isPositive(true)
+                .build();
+        Review review = reviewStorage.saveReview(reviewtemp);
+        Assertions.assertEquals(review.getReviewId(), 1L);
+        Assertions.assertEquals(review.getFilmId(), 1L);
+        Assertions.assertEquals(review.getUserId(), 1L);
+        Assertions.assertEquals(review.getIsPositive(), true);
+        review = reviewStorage.getReviewById(1L);
+        Assertions.assertEquals(review.getReviewId(), 1L);
+        Assertions.assertEquals(review.getFilmId(), 1L);
+        Assertions.assertEquals(review.getUserId(), 1L);
+        Assertions.assertEquals(review.getIsPositive(), true);
+    }
+
+    @DisplayName("Тест обновления и получения ревью по ID")
+    @Test
+    public void updateReview() {
+        createTwoUsersTwoFilm();
+        Review reviewtemp = Review.builder()
+                .content("очень хороший фильм")
+                .userId(1L)
+                .filmId(1L)
+                .isPositive(true)
+                .build();
+        reviewStorage.saveReview(reviewtemp);
+        reviewtemp = Review.builder()
+                .reviewId(1L)
+                .content("очень хороший фильм")
+                .isPositive(false)
+                .build();
+        reviewStorage.updateReview(reviewtemp);
+        Review review = reviewStorage.getReviewById(1L);
+        Assertions.assertEquals(review.getReviewId(), 1L);
+        Assertions.assertEquals(review.getIsPositive(), false);
+    }
+
+    @DisplayName("Тест обновления и получения ревью по ID")
+    @Test
+    public void deleteReview() {
+        createTwoUsersTwoFilm();
+        Review reviewtemp = Review.builder()
+                .content("очень хороший фильм")
+                .userId(1L)
+                .filmId(1L)
+                .isPositive(true)
+                .build();
+        reviewStorage.saveReview(reviewtemp);
+        reviewStorage.deleteReviewById(1L);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> {
+            reviewStorage.getReviewById(1L);
+        });
+    }
+
+    @DisplayName("Тест запроса всех ревью")
+    @Test
+    public void findAll() {
+        createTwoUsersTwoFilm();
+        Review reviewtemp = Review.builder()
+                .content("очень хороший фильм")
+                .userId(1L)
+                .filmId(1L)
+                .isPositive(true)
+                .build();
+        reviewStorage.saveReview(reviewtemp);
+        reviewtemp = Review.builder()
+                .content("очень плохой фильм")
+                .userId(2L)
+                .filmId(1L)
+                .isPositive(true)
+                .build();
+        reviewStorage.saveReview(reviewtemp);
+        List<Review> reviews = reviewStorage.readAllReviews(1L, 10L);
+        Assertions.assertEquals(reviews.size(), 2);
+        Assertions.assertEquals(reviews.get(0).getUserId(), 1L);
+        Assertions.assertEquals(reviews.get(1).getUserId(), 2L);
+    }
+
+    @DisplayName("Тест лайка ревью")
+    @Test
+    public void addLikeReview() {
+        createTwoUsersTwoFilm();
+        Review reviewtemp = Review.builder()
+                .content("очень хороший фильм")
+                .userId(1L)
+                .filmId(1L)
+                .isPositive(true)
+                .build();
+        reviewStorage.saveReview(reviewtemp);
+        reviewService.addReviewLike(1L, 2L);
+        List<Review> reviews = reviewStorage.readAllReviews(1L, 10L);
+        Assertions.assertEquals(reviews.get(0).getReviewId(), 1L);
+        Assertions.assertEquals(reviews.get(0).getUseful(), 1);
+    }
+
+    @DisplayName("Тест дислайка ревью")
+    @Test
+    public void addDisLikeReview() {
+        createTwoUsersTwoFilm();
+        Review reviewtemp = Review.builder()
+                .content("очень плохой фильм")
+                .userId(1L)
+                .filmId(1L)
+                .isPositive(false)
+                .build();
+        reviewStorage.saveReview(reviewtemp);
+        reviewService.addReviewDislike(1L, 2L);
+        List<Review> reviews = reviewStorage.readAllReviews(1L, 10L);
+        Assertions.assertEquals(reviews.get(0).getReviewId(), 1L);
+        Assertions.assertEquals(reviews.get(0).getUseful(), -1);
+    }
+
+    void createTwoUsersTwoFilm() {
+        User user = User.builder()
+                .id(1L)
+                .name("Andrey")
+                .email("ak@aknaz.ru")
+                .login("Aknaz")
+                .birthday(LocalDate.of(1988, 5, 29))
+                .friends(new HashSet<>())
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .name("Pavel")
+                .email("pavel@yandex.ru")
+                .login("pasHtetKING")
+                .birthday(LocalDate.of(1999, 8, 12))
+                .friends(new HashSet<>())
+                .build();
+        userDBStorage.saveUser(user);
+        userDBStorage.saveUser(user2);
+        Film film = Film.builder()
+                .id(1L)
+                .name("The Big Lebowski")
+                .description("Cool film")
+                .releaseDate(LocalDate.of(1998, 1, 18))
+                .duration(120)
+                .genres(Set.of(new Genre(1, "Комедия")))
+                .likes(new HashSet<>())
+                .mpa(new Mpa(4, "R"))
+                .build();
+        Film film2 = Film.builder()
+                .id(1L)
+                .name("Snatch")
+                .description("Cool film")
+                .releaseDate(LocalDate.of(2000, 8, 23))
+                .duration(120)
+                .genres(Set.of(new Genre(1, "Комедия")))
+                .likes(new HashSet<>())
+                .mpa(new Mpa(4, "R"))
+                .build();
+        filmDBStorage.saveFilm(film);
+        filmDBStorage.saveFilm(film2);
+    }
+
 
 }

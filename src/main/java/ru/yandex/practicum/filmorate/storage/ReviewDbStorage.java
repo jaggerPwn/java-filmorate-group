@@ -116,7 +116,6 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review updateReview(Review review) {
-        Validator.reviewValidator(review);
         //Здесь только 2 параметра обновляется, иначе не проходит постмен тесты.
         // Пояснения в посте наставника: https://app.pachca.com/chats?thread_id=1280887
         String sqlQuery = "UPDATE PUBLIC.REVIEWS \n" +

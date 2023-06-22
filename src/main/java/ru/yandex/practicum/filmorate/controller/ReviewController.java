@@ -52,7 +52,7 @@ public class ReviewController {
     @DeleteMapping("{filmId}")
     public void deleteFilmById(@PathVariable Long filmId) {
         log.info("Получен Delete запрос по эндпоинту '/films/{filmId}' на удаление фильма по ID");
-        reviewService.deleteFilmById(filmId);
+        reviewService.deleteReviewById(filmId);
     }
 
     @PutMapping("/{reviewId}/like/{userId}")
@@ -70,7 +70,7 @@ public class ReviewController {
             @PathVariable Long userId) {
         log.info(String.format("Получен PUT запрос по эндпоинту '/reviews/:reviewId/like/:userId' " +
                 "на DISлайк поста %d юзером%d", reviewId, userId));
-        reviewService.addReviewDISLike(reviewId, userId);
+        reviewService.addReviewDislike(reviewId, userId);
     }
 
 }
