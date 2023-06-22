@@ -17,7 +17,7 @@ public class Review {
     private Long userId;
     private Long filmId;
     @JsonProperty(value = "useful")
-    private int useful = 0;
+    private int useful;
     private final Map<Long, Boolean> reviewlikes = new HashMap<>();
 
     public int getUsefulFromReviewLikesMap() {
@@ -34,23 +34,5 @@ public class Review {
 
     public void addLike(Long userId, boolean positive) {
         reviewlikes.put(userId, positive);
-    }
-
-    public void deleteLike(Long userId) {
-        reviewlikes.remove(userId);
-    }
-
-    public Map<Long, Boolean> getReviewlikes() {
-        return new HashMap<>(reviewlikes);
-    }
-
-    public Map<String, Object> reviewToMap() {
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("content", content);
-        temp.put("isPositive", isPositive);
-        temp.put("userId", userId);
-        temp.put("filmId", filmId);
-        temp.put("useful", getUsefulFromReviewLikesMap());
-        return temp;
     }
 }

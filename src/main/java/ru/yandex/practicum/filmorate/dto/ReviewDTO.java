@@ -35,12 +35,4 @@ public class ReviewDTO {
         }
         return like;
     }
-
-    public void addGrade(Long userId, boolean positive) {
-        reviewLikes.put(userId, positive);
-    }
-
-    public void delGrade(Long userId) {
-        reviewLikes.remove(userId);
-    }
 }
