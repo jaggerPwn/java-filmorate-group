@@ -79,4 +79,12 @@ public class FilmController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("/director/{directorId}")
+    public ResponseEntity<List<FilmDTO>> getFilmsByDirectorId(@PathVariable Long directorId,
+                                                              @RequestParam String sortBy) {
+        log.info("Получен GET запрос по эндпоинту '/films/director/{}' на получение по ID режиссера " +
+                "отсортированного списка фильмов по кол-ву likes или releaseDate", directorId);
+        return new ResponseEntity<>(service.getSortedFilms(directorId, sortBy), HttpStatus.OK);
+    }
+
 }
