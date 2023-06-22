@@ -29,7 +29,8 @@ public class FilmDBStorage implements FilmStorage {
     private final DirectorStorage directorStorage;
 
     @Autowired
-    public FilmDBStorage(JdbcTemplate jdbcTemplate, MpaDBStorage mpaDBStorage, GenreStorage genreStorage, LikeDBStorage likeDBStorage, DirectorStorage directorStorage) {
+    public FilmDBStorage(JdbcTemplate jdbcTemplate, MpaDBStorage mpaDBStorage, GenreStorage genreStorage,
+                         LikeDBStorage likeDBStorage, DirectorStorage directorStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.mpaDBStorage = mpaDBStorage;
         this.genreStorage = genreStorage;

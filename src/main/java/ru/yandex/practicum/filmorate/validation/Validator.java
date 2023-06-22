@@ -68,8 +68,8 @@ public class Validator {
 
     public static boolean directorValidator(Director director) {
         if (director.getName() == null || director.getName().isBlank()) {
-            log.debug("Director name is Blanc");
-            throw new ValidationException("Director name is Blanc");
+            log.debug("Director name is Blank");
+            throw new ValidationException("Director name is Blank");
         }
         return true;
     }
