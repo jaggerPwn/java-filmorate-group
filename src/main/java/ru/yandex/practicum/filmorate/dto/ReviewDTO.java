@@ -1,13 +1,12 @@
 package ru.yandex.practicum.filmorate.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Builder
@@ -19,5 +18,29 @@ public class ReviewDTO {
     private Boolean isPositive;
     private Long userId;
     private Long filmId;
-    private long useful;
+    @JsonProperty(value = "useful")
+    private int useful;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private final Map<Long, Boolean> reviewLikes = new HashMap<>();
+
+    public int getLike() {
+        int like = 0;
+        for (var positive : reviewLikes.values()) {
+            if (positive) {
+                like++;
+            } else {
+                like--;
+            }
+        }
+        return like;
+    }
+
+    public void addGrade(Long userId, boolean positive) {
+        reviewLikes.put(userId, positive);
+    }
+
+    public void delGrade(Long userId) {
+        reviewLikes.remove(userId);
+    }
 }

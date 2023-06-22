@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +16,33 @@ public class Review {
     private Boolean isPositive;
     private Long userId;
     private Long filmId;
-    private long useful;
+    @JsonProperty(value = "useful")
+    private int useful = 0;
+    private final Map<Long, Boolean> reviewlikes = new HashMap<>();
+
+    public int getUsefulFromReviewLikesMap() {
+        int useful = 0;
+        for (var positive : reviewlikes.values()) {
+            if (positive) {
+                useful++;
+            } else {
+                useful--;
+            }
+        }
+        return useful;
+    }
+
+    public void addLike(Long userId, boolean positive) {
+        reviewlikes.put(userId, positive);
+    }
+
+    public void deleteLike(Long userId) {
+        reviewlikes.remove(userId);
+    }
+
+    public Map<Long, Boolean> getReviewlikes() {
+        return new HashMap<>(reviewlikes);
+    }
 
     public Map<String, Object> reviewToMap() {
         Map<String, Object> temp = new HashMap<>();
@@ -26,7 +50,7 @@ public class Review {
         temp.put("isPositive", isPositive);
         temp.put("userId", userId);
         temp.put("filmId", filmId);
-        temp.put("useful", useful);
+        temp.put("useful", getUsefulFromReviewLikesMap());
         return temp;
     }
 }

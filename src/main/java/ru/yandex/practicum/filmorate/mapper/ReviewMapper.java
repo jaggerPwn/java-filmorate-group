@@ -19,8 +19,8 @@ public class ReviewMapper {
                 .content(review.getContent())
                 .filmId(review.getFilmId())
                 .userId(review.getUserId())
-                .useful(review.getUseful())
                 .isPositive(review.getIsPositive())
+                .useful(review.getUseful())
                 .build();
     }
 
@@ -34,8 +34,8 @@ public class ReviewMapper {
                 .content(reviewDTO.getContent())
                 .filmId(reviewDTO.getFilmId())
                 .userId(reviewDTO.getUserId())
-                .useful(reviewDTO.getUseful())
                 .isPositive(reviewDTO.getIsPositive())
+                .useful(reviewDTO.getLike())
                 .build();
     }
 

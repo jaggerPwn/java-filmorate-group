@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.validation;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.dto.UserDTO;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -70,13 +72,31 @@ public class Validator {
         if (review.getIsPositive() == null) {
             throw new ValidationException("Review must have property isPositive");
         }
-        if (review.getUserId() < 0 || review.getUserId() == null) {
-            throw new ValidationException("ReviewID must have property more then 0");
+        if (review.getContent() == null) {
+            throw new ValidationException("Review must have property content");
         }
-        if (review.getFilmId() < 0 || review.getFilmId() == null) {
-            throw new ValidationException("FILMID must have property more then 0");
+        if (review.getUserId() == null) {
+            throw new ValidationException("ReviewID must not be null");
+        }
+        if (review.getUserId() < 0) {
+            throw new EntityNotFoundException("ReviewID must have property more then 0");
+        }
+        if (review.getFilmId() == null) {
+            throw new ValidationException("FILMID must not be null");
+        }
+        if (review.getFilmId() < 0) {
+            throw new EntityNotFoundException("FILMID must have property more then 0");
         }
         log.debug("review validation is successful");
         return true;
+    }
+
+    public static void validateForGrade(Review review, UserDTO user) {
+        if (review == null) {
+            throw new EntityNotFoundException("Отзыв не найден");
+        }
+        if (user == null) {
+            throw new EntityNotFoundException("Пользователь не найден");
+        }
     }
 }

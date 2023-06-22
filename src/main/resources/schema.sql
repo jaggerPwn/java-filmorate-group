@@ -65,16 +65,16 @@ create TABLE IF NOT EXISTS REVIEWS
 (
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     content VARCHAR(200) NOT NULL,
-    ispositive boolean,
+    ispositive BOOLEAN,
     userid BIGINT NOT NULL REFERENCES users(id) ON delete RESTRICT,
-    filmid BIGINT NOT NULL REFERENCES films(id) ON delete RESTRICT,
-    useful BIGINT DEFAULT 0
+    filmid BIGINT NOT NULL REFERENCES films(id) ON delete RESTRICT
 );
 
 create TABLE IF NOT EXISTS REVIEWLIKES
 (
   userid BIGINT REFERENCES PUBLIC.users(id) ON delete CASCADE,
   reviewid BIGINT REFERENCES PUBLIC.REVIEWS(id) ON delete CASCADE,
+  positive BOOLEAN,
   primary key (userid, reviewid)
 );
 

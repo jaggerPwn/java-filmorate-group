@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.ReviewDTO;
+import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
+import ru.yandex.practicum.filmorate.validation.Validator;
 
 import java.util.List;
 
@@ -16,10 +18,12 @@ import java.util.List;
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewStorage rs;
+    private final UserService us;
 
     @Autowired
-    public ReviewServiceImpl(@Qualifier("reviewDbStorage") ReviewStorage rs) {
+    public ReviewServiceImpl(@Qualifier("reviewDbStorage") ReviewStorage rs, UserService us) {
         this.rs = rs;
+        this.us = us;
     }
 
 
@@ -42,20 +46,20 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void addReviewLike(Long reviewId, Long userId) {
-        //TODO валидация на наличие лайка
-        //TODO добавить проверку был ли лайк от пользователя
-        ReviewDTO review = getReviewById(reviewId);
-        long useful = review.getUseful() + 1;
-        review.setUseful(useful);
-        updateReview(review);
+        Review review = this.rs.getReviewById(reviewId);
+        UserDTO user = us.getUserById(userId);
+        Validator.validateForGrade(review, user);
+        review.addLike(userId, true);
+        rs.saveReviewLikes(review);
     }
 
     @Override
     public void addReviewDISLike(Long reviewId, Long userId) {
-        ReviewDTO review = getReviewById(reviewId);
-        long useful = review.getUseful() - 1;
-        review.setUseful(useful);
-        updateReview(review);
+        Review review = this.rs.getReviewById(reviewId);
+        UserDTO user = us.getUserById(userId);
+        Validator.validateForGrade(review, user);
+        review.addLike(userId, false);
+        rs.saveReviewLikes(review);
     }
 
     @Override
