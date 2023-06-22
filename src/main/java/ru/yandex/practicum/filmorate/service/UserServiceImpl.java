@@ -9,11 +9,14 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.FilmDBStorage;
 import ru.yandex.practicum.filmorate.storage.LikeDBStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validation.Validator;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,12 +28,15 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserStorage us;
+    private final FeedService fs;
     private final LikeDBStorage likeDBStorage;
     private final FilmDBStorage filmDBStorage;
 
     @Autowired
-    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage us, LikeDBStorage likeDBStorage, FilmDBStorage filmDBStorage) {
+    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage us, LikeDBStorage likeDBStorage,
+                           FilmDBStorage filmDBStorage, FeedService fs) {
         this.us = us;
+        this.fs = fs;
         this.likeDBStorage = likeDBStorage;
         this.filmDBStorage = filmDBStorage;
     }
@@ -64,6 +70,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addFiend(Long userId, Long friendId) {
         us.userAddFriend(userId, friendId);
+        fs.saveFeed(userId, Instant.now().toEpochMilli(), EventType.FRIEND, Operation.ADD, friendId);
         log.debug("User c ID {} добавлен Friend (User) c ID {}.", userId, friendId);
     }
 
@@ -76,6 +83,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteFriendById(Long idUser, Long idFriend) {
         us.userDeleteFriend(idUser, idFriend);
+        fs.saveFeed(idUser, Instant.now().toEpochMilli(), EventType.FRIEND, Operation.REMOVE, idFriend);
         log.debug("Дружба между User c ID {} и User с ID {} аннулирована.", idUser, idFriend);
     }
 
