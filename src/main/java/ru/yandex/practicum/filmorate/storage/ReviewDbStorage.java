@@ -77,12 +77,31 @@ public class ReviewDbStorage implements ReviewStorage {
         if (count == null) count = 10L;
         List<Review> reviews = null;
         if (filmId == null) {
-            String sqlQuery = "SELECT ID, CONTENT, ISPOSITIVE, USERID, FILMID " +
-                    "FROM PUBLIC.REVIEWS LIMIT ?";
+            String sqlQuery = "SELECT R.ID,\n" +
+                    "r.CONTENT,\n" +
+                    "r.ISPOSITIVE,\n" +
+                    "r.USERID,\n" +
+                    "r.FILMID, \n" +
+                    "COUNT(POSITIVE) p\n" +
+                    "FROM PUBLIC.REVIEWS r\n" +
+                    "LEFT JOIN REVIEWLIKES rl ON rl.REVIEWID = r.ID\n" +
+                    "GROUP BY R.ID\n" +
+                    "ORDER BY p desc\n" +
+                    "LIMIT ?;";
             reviews = jdbcTemplate.query(sqlQuery, ReviewDbStorage::mapToReview, count);
         } else {
-            String sqlQuery = "SELECT ID, CONTENT, ISPOSITIVE, USERID, FILMID " +
-                    "FROM PUBLIC.REVIEWS WHERE FILMID = ? LIMIT ?";
+            String sqlQuery = "SELECT R.ID,\n" +
+                    "r.CONTENT,\n" +
+                    "r.ISPOSITIVE,\n" +
+                    "r.USERID,\n" +
+                    "r.FILMID, \n" +
+                    "COUNT(POSITIVE) p\n" +
+                    "FROM PUBLIC.REVIEWS r\n" +
+                    "LEFT JOIN REVIEWLIKES rl ON rl.REVIEWID = r.ID\n" +
+                    "WHERE FILMID = ?\n" +
+                    "GROUP BY R.ID\n" +
+                    "ORDER BY p desc\n" +
+                    "LIMIT ?;";
             reviews = jdbcTemplate.query(sqlQuery, ReviewDbStorage::mapToReview, filmId, count);
         }
         reviews.forEach(this::loadReviewLikes);
