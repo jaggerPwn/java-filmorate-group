@@ -609,9 +609,7 @@ class FilmorateApplicationTests {
                 .build();
         reviewStorage.saveReview(reviewtemp);
         reviewStorage.deleteReviewById(1L);
-        Assertions.assertThrows(EntityNotFoundException.class, () -> {
-            reviewStorage.getReviewById(1L);
-        });
+        Assertions.assertThrows(EntityNotFoundException.class, () -> reviewStorage.getReviewById(1L));
     }
 
     @DisplayName("Тест запроса всех ревью")
@@ -649,7 +647,7 @@ class FilmorateApplicationTests {
                 .isPositive(true)
                 .build();
         reviewStorage.saveReview(reviewtemp);
-        reviewService.addReviewLike(1L, 2L, true);
+        reviewService.addReviewLikeOrDislike(1L, 2L, true);
         List<Review> reviews = reviewStorage.readAllReviews(1L, 10L);
         Assertions.assertEquals(reviews.get(0).getReviewId(), 1L);
         Assertions.assertEquals(reviews.get(0).getUseful(), 1);
@@ -666,7 +664,7 @@ class FilmorateApplicationTests {
                 .isPositive(false)
                 .build();
         reviewStorage.saveReview(reviewtemp);
-        reviewService.addReviewLike(1L, 2L, false);
+        reviewService.addReviewLikeOrDislike(1L, 2L, false);
         List<Review> reviews = reviewStorage.readAllReviews(1L, 10L);
         Assertions.assertEquals(reviews.get(0).getReviewId(), 1L);
         Assertions.assertEquals(reviews.get(0).getUseful(), -1);

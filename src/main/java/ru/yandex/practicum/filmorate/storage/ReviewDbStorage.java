@@ -52,7 +52,7 @@ public class ReviewDbStorage implements ReviewStorage {
             e.printStackTrace();
             throw new ValidationException("key not assigned");
         }
-        log.debug("Отзыв создан");
+        log.debug("Отзыв на Film c ID {} от User c ID {} создано", review.getFilmId(), review.getUserId());
         return review;
     }
 
@@ -66,14 +66,14 @@ public class ReviewDbStorage implements ReviewStorage {
         } catch (DataAccessException e) {
             throw new EntityNotFoundException("review " + id + " not found");
         }
-        log.debug("Отзыв получен");
+        log.debug("Отзыв с ID {} на Film c ID {} от User c ID {} получено",
+                review.getReviewId(), review.getFilmId(), review.getUserId());
         return review;
     }
 
     @Override
     public List<Review> readAllReviews(Long filmId, Long count) {
-        if (count == null) count = 10L;
-        List<Review> reviews = null;
+        List<Review> reviews;
         if (filmId == null) {
             String sqlQuery = "SELECT R.ID,\n" +
                     "r.CONTENT,\n" +
@@ -102,17 +102,25 @@ public class ReviewDbStorage implements ReviewStorage {
                     "LIMIT ?;";
             reviews = jdbcTemplate.query(sqlQuery, ReviewDbStorage::mapToReview, filmId, count);
         }
-        log.debug("Отзывы получены");
+        log.debug("Отзывы на Film c ID {} получены.", filmId);
         return reviews;
     }
 
     @Override
-    public void saveReviewLikes(Long reviewId, Long userId, boolean positive) {
+    public void saveReviewLikesOrDislikes(Long reviewId, Long userId, boolean positive) {
         String sql = "DELETE FROM REVIEWLIKES WHERE REVIEWID = ?";
         jdbcTemplate.update(sql, reviewId);
         sql = "INSERT INTO reviewLikes (REVIEWID, USERID, POSITIVE) VALUES(?, ?, ?)";
         jdbcTemplate.update(sql, reviewId, userId, positive);
-        log.debug("Лайки сохранены");
+        log.debug("Реакция на отзывы c ID {} от User c ID {} сохранены", reviewId, userId);
+    }
+
+    @Override
+    public void deleteReviewLikesOrDislikes(Long reviewId, Long userId, boolean positive) {
+        String sql = "DELETE FROM PUBLIC.REVIEWLIKES\n" +
+                "WHERE USERID=? AND REVIEWID=? AND POSITIVE=?";
+        jdbcTemplate.update(sql, positive, userId, reviewId);
+        log.debug("Удаление реакции на отзывы c ID {} от User c ID {} успешно выполнено", reviewId, userId);
     }
 
     @Override
@@ -124,7 +132,7 @@ public class ReviewDbStorage implements ReviewStorage {
                 "WHERE ID = ?";
         jdbcTemplate.update(sqlQuery, review.getContent(), review.getIsPositive(), review.getReviewId());
         Review reviewById = getReviewById(review.getReviewId());
-        log.debug("Отзыв обновлен");
+        log.debug("Отзыв c ID {} обновлен", review.getReviewId());
         return reviewById;
     }
 
@@ -133,7 +141,7 @@ public class ReviewDbStorage implements ReviewStorage {
     public void deleteReviewById(Long id) {
         String sqlQuery = "DELETE FROM PUBLIC.REVIEWS WHERE ID=?";
         jdbcTemplate.update(sqlQuery, id);
-        log.debug("Отзыв удален");
+        log.debug("Review c ID {} удалён", id);
     }
 
     public static Review mapToReview(ResultSet resultSet, int i) throws SQLException {

@@ -64,7 +64,7 @@ drop table IF EXISTS reviewlikes cascade;
 create TABLE IF NOT EXISTS REVIEWS
 (
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    content VARCHAR(200) NOT NULL,
+    content VARCHAR NOT NULL,
     ispositive BOOLEAN,
     userid BIGINT NOT NULL REFERENCES users(id) ON delete RESTRICT,
     filmid BIGINT NOT NULL REFERENCES films(id) ON delete RESTRICT

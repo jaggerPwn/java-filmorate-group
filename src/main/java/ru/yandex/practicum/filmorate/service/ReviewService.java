@@ -16,5 +16,7 @@ public interface ReviewService {
 
     void deleteReviewById(Long filmId);
 
-    void addReviewLike(Long reviewId, Long userId, boolean positive);
+    void addReviewLikeOrDislike(Long reviewId, Long userId, boolean positive);
+
+    void deleteReviewLikeOrDislike(Long reviewId, Long userId, boolean positive);
 }
