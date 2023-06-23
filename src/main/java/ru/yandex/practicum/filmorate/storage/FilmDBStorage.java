@@ -197,44 +197,50 @@ public class FilmDBStorage implements FilmStorage {
     public List<Film> searchFilmForDirector(String queryStr){
         String query = "SELECT * FROM FILMS " +
                 "LEFT JOIN FILMDIRECTORS ON FILMDIRECTORS.FILMID = films.ID " +
-                "LEFT JOIN DIRECTORS ON DIRECTORS.ID = FILMDIRECTORS.DIRECTORID " +
-                "WHERE DIRECTORS.NAME LIKE ?";
-        List<Film> films = jdbcTemplate.query(query, this::mapToFilm, "%" + queryStr + "%");
+                "LEFT JOIN DIRECTORS ON DIRECTORS.directorid = FILMDIRECTORS.DIRECTORID " +
+                "WHERE LOWER(DIRECTORS.NAME) LIKE ?";
+        List<Film> films = jdbcTemplate.query(query, this::mapToFilm, "%" + queryStr.toLowerCase() + "%");
         log.debug("Получены все Film по имени режиссёра");
         return films;
     }
 
     public List<Film> searchFilmForTitle(String queryStr){
         String query = "SELECT * FROM FILMS " +
-                "WHERE FILMS.NAME  LIKE ?";
-        List<Film> films = jdbcTemplate.query(query, this::mapToFilm, "%" + queryStr + "%");
+                "WHERE LOWER(FILMS.NAME) LIKE ?";
+        List<Film> films = jdbcTemplate.query(query, this::mapToFilm, "%" + queryStr.toLowerCase() + "%");
         log.debug("Получены все Film по названию");
         return films;
     }
 
     public List<Film> searchFilmForTitleAndDirector(String queryStr){
-        String query = "SELECT * FROM FILMS " +
+        String query = "Select FILMS.id, FILMS.name, FILMS.description, FILMS.releaseDate, FILMS.duration, FILMS.mpaid " +
+                "FROM FILMS " +
                 "LEFT JOIN FILMDIRECTORS ON FILMDIRECTORS.FILMID = films.ID " +
-                "LEFT JOIN DIRECTORS ON DIRECTORS.ID = FILMDIRECTORS.DIRECTORID " +
-                "WHERE DIRECTORS.NAME LIKE ? OR FILMS.NAME  LIKE ?";
-        List<Film> films = jdbcTemplate.query(query, this::mapToFilm, "%" + queryStr + "%" ,"%" + queryStr + "%");
+                "LEFT JOIN DIRECTORS ON DIRECTORS.directorid = FILMDIRECTORS.DIRECTORID " +
+                "LEFT JOIN likes l ON FILMS.id = l.filmid " +
+                "WHERE LOWER(DIRECTORS.NAME) LIKE ? OR LOWER(FILMS.NAME) LIKE ? " +
+                "GROUP BY FILMS.id " +
+                "ORDER BY count(l.userid) DESC";
+        List<Film> films = jdbcTemplate.query(query, this::mapToFilm,
+                "%" + queryStr.toLowerCase() + "%" ,"%" + queryStr.toLowerCase() + "%");
         log.debug("Получены все Film по названию и режиссёру");
         return films;
     }
 
-    public List<Film> searchFilm(String query, String by){
-        List<Film> films = null;
-        if(query == null){
-            return null;
+    public List<Film> searchFilm(String query, String by) {
+        if (query == null || query.isBlank()) {
+            return Collections.emptyList();
         }
-        if(by.contains("director") && by.contains("title")){
-            films = searchFilmForTitleAndDirector(query);
-        } else if (by.contains("director") && (!by.contains("title"))) {
-            films = searchFilmForDirector(query);
+
+        if (by.contains("director") && by.contains("title")) {
+            return searchFilmForTitleAndDirector(query);
+        } else if (by.contains("director")) {
+            return searchFilmForDirector(query);
         } else if (by.contains("title")) {
-            films = searchFilmForTitle(query);
+            return searchFilmForTitle(query);
+        } else {
+            return Collections.emptyList(); // or throw an exception
         }
-        return films;
     }
 
     public List<Film> topFilms(){
@@ -248,6 +254,7 @@ public class FilmDBStorage implements FilmStorage {
         log.debug("Получены все Film по рейтингу");
         return jdbcTemplate.query(query, this::mapToFilm);
     }
+
     @Override
     public void deleteFilm(Long id) {
         String query = "DELETE FROM films WHERE id = ?";

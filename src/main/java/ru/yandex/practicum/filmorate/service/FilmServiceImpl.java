@@ -108,9 +108,6 @@ public class FilmServiceImpl implements FilmService {
 
 
     public List<FilmDTO> searchFilm(String query, String by){
-        if(query == null){
-            return FilmMapper.listFilmsToListDto(fs.topFilms());
-        }
         return FilmMapper.listFilmsToListDto(fs.searchFilm(query,by));
     }
 
