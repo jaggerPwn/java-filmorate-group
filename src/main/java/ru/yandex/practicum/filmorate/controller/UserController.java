@@ -93,7 +93,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/feed")
-    public ResponseEntity<List<EventDTO>> getFeed (@PathVariable(value = "id") Long id){
+    public ResponseEntity<List<EventDTO>> getUserFeed(@PathVariable(value = "id") Long id){
         log.info("Получен GET запрос по эндпоинту '/users/{}/feed' на получение ленты событий Юзера", id);
         return new ResponseEntity<>(feedService.getFeed(id), HttpStatus.OK);
     }

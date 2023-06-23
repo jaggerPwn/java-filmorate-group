@@ -40,7 +40,8 @@ public class FeedServiceImpl implements FeedService {
                 .operation(operation)
                 .entityId(entityId)
                 .build();
-
+        log.debug("В ленту пользователя с ID {} добавлено событие типа - {} операция - {}.", userId,
+                eventType.toString(), operation.toString());
         return EventMapper.eventToDTO(feedStorage.saveFeed(eventToSave));
     }
 }
