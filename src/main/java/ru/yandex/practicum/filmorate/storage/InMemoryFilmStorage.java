@@ -51,13 +51,27 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.debug("Film с ID {} не получен", id);
             throw new EntityNotFoundException("Film с ID не найден");
         }
+    }
 
+    public List<Film> getSortedFilms(Long id, String sortBy) {
+        return null;
     }
 
     @Override
     public Set<Film> getTopFilms(Long count) {
         return null;
     }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return null;
+    }
+
+
+    @Override
+    public void deleteFilm(Long id) {
+    }
+
 
     @Override
     public List<Film> searchFilm(String query, String by) {
@@ -68,6 +82,4 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Film> topFilms() {
         return null;
     }
-
-
 }

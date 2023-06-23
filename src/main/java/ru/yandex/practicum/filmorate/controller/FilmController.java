@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDTO;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -65,6 +64,27 @@ public class FilmController {
     public ResponseEntity<FilmDTO> getFilmById(@PathVariable Long filmId) {
         log.info("Получен GET запрос по эндпоинту '/films/{filmId}' на получение фильма по ID");
         return new ResponseEntity<>(service.getFilmByID(filmId), HttpStatus.OK);
+    }
+
+    @GetMapping("/common")
+    public ResponseEntity<List<FilmDTO>> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        log.info("Получен GET запрос по эндпоинту '/films/common' на получение общих фильмов у двух Users");
+        return new ResponseEntity<>(service.getCommonFilms(userId, friendId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{filmId}")
+    public ResponseEntity<?> deleteFilm(@PathVariable Long filmId) {
+        log.info("Получен DELETE запрос по эндпоинту '/films/{}' на удаление Film", filmId);
+        service.deleteFilm(filmId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public ResponseEntity<List<FilmDTO>> getFilmsByDirectorId(@PathVariable Long directorId,
+                                                              @RequestParam String sortBy) {
+        log.info("Получен GET запрос по эндпоинту '/films/director/{}' на получение по ID режиссера " +
+                "отсортированного списка фильмов по кол-ву likes или releaseDate", directorId);
+        return new ResponseEntity<>(service.getSortedFilms(directorId, sortBy), HttpStatus.OK);
     }
 
     @GetMapping(value = "search", params = {"query", "by"})

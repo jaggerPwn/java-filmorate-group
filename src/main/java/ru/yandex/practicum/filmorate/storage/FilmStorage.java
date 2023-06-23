@@ -16,6 +16,13 @@ public interface FilmStorage {
     Film getFilmById(Long id);
 
     Set<Film> getTopFilms(Long count);
-    public List<Film> searchFilm(String query, String by);
-    public List<Film> topFilms();
+
+    List<Film> getCommonFilms(Long userId, Long friendId);
+
+    void deleteFilm(Long id);
+
+    List<Film> getSortedFilms(Long id, String sortBy);
+
+    List<Film> searchFilm(String query, String by);
+    List<Film> topFilms();
 }
