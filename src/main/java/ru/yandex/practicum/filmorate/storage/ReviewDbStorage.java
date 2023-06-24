@@ -49,10 +49,9 @@ public class ReviewDbStorage implements ReviewStorage {
         try {
             review.setReviewId(keyHolder.getKey().longValue());
         } catch (InvalidDataAccessApiUsageException | NullPointerException e) {
-            e.printStackTrace();
             throw new ValidationException("key not assigned");
         }
-        log.debug("Отзыв на Film c ID {} от User c ID {} создано", review.getFilmId(), review.getUserId());
+        log.debug("Отзыв на Film c ID {} от User c ID {} создан", review.getFilmId(), review.getUserId());
         return review;
     }
 
@@ -108,8 +107,8 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public void saveReviewLikesOrDislikes(Long reviewId, Long userId, boolean positive) {
-        String sql = "DELETE FROM REVIEWLIKES WHERE REVIEWID = ?";
-        jdbcTemplate.update(sql, reviewId);
+        String sql = "DELETE FROM REVIEWLIKES WHERE REVIEWID = ? AND USERID = ?";
+        jdbcTemplate.update(sql, reviewId, userId);
         sql = "INSERT INTO reviewLikes (REVIEWID, USERID, POSITIVE) VALUES(?, ?, ?)";
         jdbcTemplate.update(sql, reviewId, userId, positive);
         log.debug("Реакция на отзывы c ID {} от User c ID {} сохранены", reviewId, userId);
