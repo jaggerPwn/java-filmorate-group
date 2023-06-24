@@ -58,6 +58,21 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> searchFilmForDirector(String queryStr) {
+        return null;
+    }
+
+    @Override
+    public List<Film> searchFilmForTitle(String queryStr) {
+        return null;
+    }
+
+    @Override
+    public List<Film> searchFilmForTitleAndDirector(String queryStr) {
+        return null;
+    }
+
+    @Override
     public Set<Film> getTopFilms(Long count) {
         return null;
     }
@@ -70,16 +85,5 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void deleteFilm(Long id) {
-    }
-
-
-    @Override
-    public List<Film> searchFilm(String query, String by) {
-        return null;
-    }
-
-    @Override
-    public List<Film> topFilms() {
-        return null;
     }
 }

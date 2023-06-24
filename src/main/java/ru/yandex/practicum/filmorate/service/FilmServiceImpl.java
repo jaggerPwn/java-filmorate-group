@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.LikeDBStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validation.Validator;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -107,11 +108,27 @@ public class FilmServiceImpl implements FilmService {
     }
 
 
-    public List<FilmDTO> searchFilm(String query, String by){
-        return FilmMapper.listFilmsToListDto(fs.searchFilm(query,by));
+    public List<FilmDTO> searchFilm(String query, String by) {
+        return FilmMapper.listFilmsToListDto(search(query, by));
     }
 
-    public List<FilmDTO> topFilms(){
-        return FilmMapper.listFilmsToListDto(fs.topFilms());
+    @Override
+    public List<FilmDTO> getTopFilms(Long count) {
+        return FilmMapper.listFilmsToListDto(fs.getTopFilms(count));
+    }
+
+    public List<Film> search(String query, String by) {
+        if (query == null || query.isBlank()) {
+            return Collections.emptyList();
+        }
+        if (by.contains("director") && by.contains("title")) {
+            return fs.searchFilmForTitleAndDirector(query);
+        } else if (by.contains("director")) {
+            return fs.searchFilmForDirector(query);
+        } else if (by.contains("title")) {
+            return fs.searchFilmForTitle(query);
+        } else {
+            return Collections.emptyList(); // or throw an exception
+        }
     }
 }

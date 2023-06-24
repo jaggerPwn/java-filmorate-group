@@ -96,7 +96,7 @@ public class FilmController {
 
     @GetMapping("search")
     public ResponseEntity<List<FilmDTO>> getAllFilms() {
-        return new ResponseEntity<>(service.topFilms(), HttpStatus.OK);
+        return new ResponseEntity<>(service.getTopFilms(null), HttpStatus.OK);
     }
 
 }

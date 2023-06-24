@@ -128,10 +128,16 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public Set<Film> getTopFilms(Long count) {
+        long countFilms;
+        if (count == null) {
+            countFilms = readAllFilms().size();
+        } else {
+            countFilms = count;
+        }
         String query = "SELECT id, name, description, releaseDate, duration, mpaid FROM films " +
                 "LEFT JOIN likes ON id = filmid GROUP BY id ORDER BY count(userid) desc  LIMIT ?";
-        List<Film> topFilms = jdbcTemplate.query(query, this::mapToFilm, count);
-        log.debug("Получаем топ {} Film по кол-ву Likes.", count);
+        List<Film> topFilms = jdbcTemplate.query(query, this::mapToFilm, countFilms);
+        log.debug("Получаем топ {} Film по кол-ву Likes.", countFilms);
         return new HashSet<>(topFilms);
     }
 
@@ -194,25 +200,25 @@ public class FilmDBStorage implements FilmStorage {
     }
 
 
-    public List<Film> searchFilmForDirector(String queryStr){
+    public List<Film> searchFilmForDirector(String queryStr) {
         String query = "SELECT * FROM FILMS " +
                 "LEFT JOIN FILMDIRECTORS ON FILMDIRECTORS.FILMID = films.ID " +
                 "LEFT JOIN DIRECTORS ON DIRECTORS.directorid = FILMDIRECTORS.DIRECTORID " +
                 "WHERE LOWER(DIRECTORS.NAME) LIKE ?";
         List<Film> films = jdbcTemplate.query(query, this::mapToFilm, "%" + queryStr.toLowerCase() + "%");
-        log.debug("Получены все Film по имени режиссёра");
+        log.debug("Получены все Film по имени режиссёра {}", queryStr);
         return films;
     }
 
-    public List<Film> searchFilmForTitle(String queryStr){
+    public List<Film> searchFilmForTitle(String queryStr) {
         String query = "SELECT * FROM FILMS " +
                 "WHERE LOWER(FILMS.NAME) LIKE ?";
         List<Film> films = jdbcTemplate.query(query, this::mapToFilm, "%" + queryStr.toLowerCase() + "%");
-        log.debug("Получены все Film по названию");
+        log.debug("Получены все Film по названию {}", queryStr);
         return films;
     }
 
-    public List<Film> searchFilmForTitleAndDirector(String queryStr){
+    public List<Film> searchFilmForTitleAndDirector(String queryStr) {
         String query = "Select FILMS.id, FILMS.name, FILMS.description, FILMS.releaseDate, FILMS.duration, FILMS.mpaid " +
                 "FROM FILMS " +
                 "LEFT JOIN FILMDIRECTORS ON FILMDIRECTORS.FILMID = films.ID " +
@@ -222,37 +228,9 @@ public class FilmDBStorage implements FilmStorage {
                 "GROUP BY FILMS.id " +
                 "ORDER BY count(l.userid) DESC";
         List<Film> films = jdbcTemplate.query(query, this::mapToFilm,
-                "%" + queryStr.toLowerCase() + "%" ,"%" + queryStr.toLowerCase() + "%");
+                "%" + queryStr.toLowerCase() + "%", "%" + queryStr.toLowerCase() + "%");
         log.debug("Получены все Film по названию и режиссёру");
         return films;
-    }
-
-    public List<Film> searchFilm(String query, String by) {
-        if (query == null || query.isBlank()) {
-            return Collections.emptyList();
-        }
-
-        if (by.contains("director") && by.contains("title")) {
-            return searchFilmForTitleAndDirector(query);
-        } else if (by.contains("director")) {
-            return searchFilmForDirector(query);
-        } else if (by.contains("title")) {
-            return searchFilmForTitle(query);
-        } else {
-            return Collections.emptyList(); // or throw an exception
-        }
-    }
-
-    public List<Film> topFilms(){
-        String query = "Select f.id, f.name, f.description, f.releaseDate, f.duration, f.mpaid " +
-                "FROM films f " +
-                "LEFT JOIN filmgenres fg ON f.id = filmid " +
-                "LEFT JOIN genres g ON fg.genreid = g.id " +
-                "LEFT JOIN likes l ON f.id = l.filmid " +
-                "GROUP BY f.id " +
-                "ORDER BY count(l.userid) DESC";
-        log.debug("Получены все Film по рейтингу");
-        return jdbcTemplate.query(query, this::mapToFilm);
     }
 
     @Override

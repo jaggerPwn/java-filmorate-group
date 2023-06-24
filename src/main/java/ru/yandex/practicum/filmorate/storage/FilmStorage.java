@@ -23,6 +23,9 @@ public interface FilmStorage {
 
     List<Film> getSortedFilms(Long id, String sortBy);
 
-    List<Film> searchFilm(String query, String by);
-    List<Film> topFilms();
+    List<Film> searchFilmForDirector(String queryStr);
+
+    List<Film> searchFilmForTitle(String queryStr);
+
+    List<Film> searchFilmForTitleAndDirector(String queryStr);
 }
