@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.LikeDBStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validation.Validator;
 
@@ -22,10 +23,12 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserStorage us;
+    private final LikeDBStorage likeDBStorage;
 
     @Autowired
-    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage us) {
+    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage us, LikeDBStorage likeDBStorage) {
         this.us = us;
+        this.likeDBStorage = likeDBStorage;
     }
 
     @Override
@@ -69,7 +72,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteFriendById(Long idUser, Long idFriend) {
         us.userDeleteFriend(idUser, idFriend);
-        log.debug("Дружба между User c ID {} и User с ID {} аннулирована.", idUser,idFriend);
+        log.debug("Дружба между User c ID {} и User с ID {} аннулирована.", idUser, idFriend);
     }
 
     @Override
@@ -90,6 +93,13 @@ public class UserServiceImpl implements UserService {
         ids.retainAll(us.getUserById(idUser2).getFriends());
         log.debug("Возвращён список общих друзей у User с ID {} и User c ID {}.", idUser1, idUser2);
         return ids.stream().map(us::getUserById).map(UserMapper::userToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Long> findRecomendation(Long idUser) {
+        List<Long> sameUserIds = likeDBStorage.getUsersWithSameLikes(idUser);
+        List<Long> recommendations = likeDBStorage.getFilmRecommendationsFrom(idUser, sameUserIds);
+        return recommendations;
     }
 
 }

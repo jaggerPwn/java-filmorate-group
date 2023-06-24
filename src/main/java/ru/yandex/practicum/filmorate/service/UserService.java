@@ -22,5 +22,5 @@ public interface UserService {
 
     List<UserDTO> readAllCommonFriends(Long idUser1, Long idUser2);
 
-
+    List<Long> findRecomendation(Long idUser);
 }
