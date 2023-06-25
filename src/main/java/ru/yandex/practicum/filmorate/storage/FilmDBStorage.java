@@ -245,7 +245,6 @@ public class FilmDBStorage implements FilmStorage {
 
     @Override
     public List<Film> getCommonFilms(Long userId, Long friendId) { //TODO прогнать тесты в Postman
-
         String query = "SELECT * FROM films f "
                 + "LEFT JOIN likes l1 ON f.id = l1.filmid "
                 + "LEFT JOIN likes l2 ON f.id = l2.filmid "
@@ -257,5 +256,4 @@ public class FilmDBStorage implements FilmStorage {
         log.debug("Получены фильмы общие у Users userId {} и friend id {}.", userId, friendId);
         return commonFilms;
     }
-
 }
