@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -53,7 +54,9 @@ public class LikeDBStorage {
                 " having rate > 1 " +
                 " order by rate desc" +
                 " limit 10";
-        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("USERID"), userId);
+        List<Long> usersForLike = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("USERID"), userId);
+        log.debug("Получен список userid с похожими лайками: {}.", userId);
+        return usersForLike;
     }
 
     public List<Long> getFilmRecommendationsFrom(Long userId, List<Long> sameUserIds) {
@@ -61,7 +64,9 @@ public class LikeDBStorage {
         final String sqlQuery = "select fl.filmid from likes fl" +
                 " where  fl.userid in (" + inSql + ")" +
                 "    and fl.filmid not in (select ul.filmid from likes ul where ul.userid = ?)";
-        return jdbcTemplate.query(sqlQuery, LikeDBStorage::mapRow, sameUserIds.toArray(), userId);
+        List<Long> idFilmsOfRec = jdbcTemplate.query(sqlQuery, LikeDBStorage::mapRow, sameUserIds.toArray(), userId);
+        log.debug("Список id фильмов для рекомендаций: {}.", idFilmsOfRec);
+        return idFilmsOfRec;
     }
 
     private static Long mapRow(ResultSet rs, int rowNum) throws SQLException {

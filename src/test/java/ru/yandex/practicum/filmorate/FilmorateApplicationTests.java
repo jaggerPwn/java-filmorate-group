@@ -539,7 +539,7 @@ class FilmorateApplicationTests {
         userDBStorage.saveUser(user2);
         likeDBStorage.addLike(1L, 2L);
         likeDBStorage.addLike(2L, 2L);
-        List<Long> saveRecomendation =userServiceImpl.findRecomendation(2L);
+        List<Film> saveRecomendation =userServiceImpl.findRecommendation(2L);
         Assertions.assertEquals(1, saveRecomendation.size());
         Assertions.assertEquals(3L, saveRecomendation.get(0));
     }
