@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.LikeDBStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validation.Validator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -107,17 +108,14 @@ public class FilmServiceImpl implements FilmService {
         return sortedFilms;
     }
 
-
     public List<FilmDTO> searchFilm(String query, String by) {
         return FilmMapper.listFilmsToListDto(search(query, by));
     }
 
-    @Override
-    public List<FilmDTO> getTopFilms(Long count) {
-        return FilmMapper.listFilmsToListDto(fs.getTopFilms(count));
-    }
-
     public List<Film> search(String query, String by) {
+        if (query == null && by == null) {
+            return new ArrayList<>(fs.getTopFilms(null));
+        }
         if (query == null || query.isBlank()) {
             return Collections.emptyList();
         }
@@ -127,8 +125,7 @@ public class FilmServiceImpl implements FilmService {
             return fs.searchFilmForDirector(query);
         } else if (by.contains("title")) {
             return fs.searchFilmForTitle(query);
-        } else {
-            return Collections.emptyList(); // or throw an exception
         }
+        return null;
     }
 }

@@ -51,5 +51,4 @@ public class FilmMapper {
     public static List<FilmDTO> listFilmsToListDto(Collection<Film> films) {
         return films.stream().map(FilmMapper::filmToDTO).collect(Collectors.toList());
     }
-
 }

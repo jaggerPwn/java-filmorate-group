@@ -87,16 +87,11 @@ public class FilmController {
         return new ResponseEntity<>(service.getSortedFilms(directorId, sortBy), HttpStatus.OK);
     }
 
-    @GetMapping(value = "search", params = {"query", "by"})
-    public ResponseEntity<List<FilmDTO>> searchFilmForDirector(@RequestParam("query") String query,
-                                                               @RequestParam(value = "by", defaultValue = "title") String by){
-
-        return new ResponseEntity<>(service.searchFilm(query,by), HttpStatus.OK);
+    @GetMapping(value = "search")
+    public ResponseEntity<List<FilmDTO>> searchFilm(@RequestParam(name = "query", required = false) String query,
+                                                    @RequestParam(name = "by", required = false) String by) {
+        log.info("Получен GET запрос по эндпоинту '/films/search/' на получение по списка фильмов по " +
+                "называнию {} и/или режиссеру {} .", query, by);
+        return new ResponseEntity<>(service.searchFilm(query, by), HttpStatus.OK);
     }
-
-    @GetMapping("search")
-    public ResponseEntity<List<FilmDTO>> getAllFilms() {
-        return new ResponseEntity<>(service.getTopFilms(null), HttpStatus.OK);
-    }
-
 }
