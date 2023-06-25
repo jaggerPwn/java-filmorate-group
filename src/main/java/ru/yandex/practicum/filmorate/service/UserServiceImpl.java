@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
         for (Long id : recommendations) {
             films.add(filmDBStorage.getFilmById(id));
         }
-        log.debug("Рекомендации для пользователя с ID {}:{} ", idUser,films);
+        log.debug("Рекомендации для пользователя с ID {}:{} ", idUser, films);
         return films;
     }
 }
