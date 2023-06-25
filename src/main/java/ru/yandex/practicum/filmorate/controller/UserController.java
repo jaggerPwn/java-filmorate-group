@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -72,12 +71,6 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long userId) {
         log.info("Получен GET запрос по эндпоинту '/users/{userId}' на получение юзера по ID");
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
-    }
-
-    @GetMapping("{id}/recommendations")
-    public ResponseEntity<List<Film>> findRecommendation(@PathVariable Long id) {
-        log.info("Получен GET запрос по эндпоинту '{id}/recommendations' на получение рекомендации");
-        return new ResponseEntity<>(userService.findRecommendation(id), HttpStatus.OK);
     }
 
 }

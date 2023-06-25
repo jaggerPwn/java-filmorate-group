@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserServiceImpl;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
@@ -32,7 +31,6 @@ class FilmorateApplicationTests {
     private final GenreDBStorage genreDBStorage;
     private final LikeDBStorage likeDBStorage;
     private final MpaDBStorage mpaDBStorage;
-    private final UserServiceImpl userServiceImpl;
 
 
     //ТЕСТЫ GENRES
@@ -477,71 +475,6 @@ class FilmorateApplicationTests {
         User[] expected = {friend, friend2};
         Assertions.assertArrayEquals(expected, userDBStorage.getAllFriendByUserId(1L).toArray(), "Ожидалось получение " +
                 "всех friend у конкретного User");
-    }
-    @DisplayName("Тест для рекомендаций")
-    @Test
-    public void findRecomendationTest(){
-        Film film = Film.builder()
-                .id(1L)
-                .name("Film1")
-                .description("Cool film")
-                .releaseDate(LocalDate.of(2000, 8, 23))
-                .duration(120)
-                .genres(Set.of(new Genre(1, "Комедия")))
-                .likes(new HashSet<>())
-                .mpa(new Mpa(4, "R"))
-                .build();
-        filmDBStorage.saveFilm(film);
-        Film film2 = Film.builder()
-                .id(2L)
-                .name("Film2")
-                .description("Cool film")
-                .releaseDate(LocalDate.of(2001, 8, 23))
-                .duration(120)
-                .genres(Set.of(new Genre(1, "Комедия")))
-                .likes(new HashSet<>())
-                .mpa(new Mpa(4, "R"))
-                .build();
-        filmDBStorage.saveFilm(film2);
-        Film film3 = Film.builder()
-                .id(2L)
-                .name("Film3")
-                .description("Cool film")
-                .releaseDate(LocalDate.of(2002, 8, 23))
-                .duration(120)
-                .genres(Set.of(new Genre(1, "Комедия")))
-                .likes(new HashSet<>())
-                .mpa(new Mpa(4, "R"))
-                .build();
-        filmDBStorage.saveFilm(film3);
-
-        User user = User.builder()
-                .id(1L)
-                .name("Andrey")
-                .email("ak@aknaz.ru")
-                .login("AKnaz")
-                .birthday(LocalDate.of(1988, 5, 29))
-                .friends(new HashSet<>())
-                .build();
-        userDBStorage.saveUser(user);
-        likeDBStorage.addLike(1L, 1L);
-        likeDBStorage.addLike(2L, 1L);
-        likeDBStorage.addLike(3L, 1L);
-
-        User user2 = User.builder()
-                .id(2L)
-                .name("Pavel")
-                .email("pavel@yandex.ru")
-                .login("pasHtetKING")
-                .birthday(LocalDate.of(1999, 8, 12))
-                .friends(new HashSet<>())
-                .build();
-        userDBStorage.saveUser(user2);
-        likeDBStorage.addLike(1L, 2L);
-        likeDBStorage.addLike(2L, 2L);
-        List<Film> saveRecomendation =userServiceImpl.findRecommendation(2L);
-        Assertions.assertEquals(1, saveRecomendation.size());
-        Assertions.assertEquals(3L, saveRecomendation.get(0));
     }
 
 }
