@@ -18,7 +18,7 @@ public class EventMapper {
         }
 
         return EventDTO.builder()
-                .id(event.getId())
+                .eventId(event.getEventId())
                 .userId(event.getUserId())
                 .timestamp(event.getTimestamp())
                 .eventType(event.getEventType())
@@ -33,7 +33,7 @@ public class EventMapper {
         }
 
         return Event.builder()
-                .id(eventDTO.getId())
+                .eventId(eventDTO.getEventId())
                 .userId(eventDTO.getUserId())
                 .timestamp(eventDTO.getTimestamp())
                 .eventType(eventDTO.getEventType())

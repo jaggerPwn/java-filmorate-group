@@ -36,14 +36,14 @@ public class FeedDBStorage implements FeedStorage {
                 .usingGeneratedKeyColumns("id");
 
         Number key = simpleJdbcInsert.executeAndReturnKey(event.eventToMap());
-        event.setId((long)key);
+        event.setEventId((long)key);
         return event;
     }
 
     private Event mapToEvent(ResultSet rs, int rowNum) throws SQLException{
         return Event.builder()
-                .id(rs.getLong("id"))
-                .userId(rs.getLong("userid"))
+                .eventId(rs.getLong("id"))
+                .userId(rs.getLong("userId"))
                 .timestamp(rs.getLong("timestamp"))
                 .eventType(EventType.valueOf(rs.getString("eventType")))
                 .operation(Operation.valueOf(rs.getString("operation")))

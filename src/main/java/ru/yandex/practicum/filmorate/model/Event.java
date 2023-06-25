@@ -16,7 +16,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class Event {
 
-    private long id;
+    private long eventId;
     private long userId;
     private long timestamp;
     private EventType eventType;
