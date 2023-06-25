@@ -73,6 +73,30 @@ create TABLE IF NOT EXISTS filmdirectors
   primary key (filmid, directorid)
 );
 
+drop table IF EXISTS reviews cascade;
+drop table IF EXISTS reviewlikes cascade;
+
+create TABLE IF NOT EXISTS REVIEWS
+(
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    content VARCHAR NOT NULL,
+    ispositive BOOLEAN,
+    userid BIGINT NOT NULL REFERENCES users(id) ON delete RESTRICT,
+    filmid BIGINT NOT NULL REFERENCES films(id) ON delete RESTRICT
+);
+
+create TABLE IF NOT EXISTS REVIEWLIKES
+(
+  userid BIGINT REFERENCES PUBLIC.users(id) ON delete CASCADE,
+  reviewid BIGINT REFERENCES PUBLIC.REVIEWS(id) ON delete CASCADE,
+  positive BOOLEAN,
+  primary key (userid, reviewid)
+);
+
+ALTER TABLE IF EXISTS FILMS ALTER COLUMN ID RESTART WITH 1;
+ALTER TABLE IF EXISTS USERS ALTER COLUMN ID RESTART WITH 1;
+ALTER TABLE IF EXISTS REVIEWS ALTER COLUMN ID RESTART WITH 1;
+
 INSERT INTO mpa (id, name) VALUES (1, 'G');
 INSERT INTO mpa (id, name) VALUES (2, 'PG');
 INSERT INTO mpa (id, name) VALUES (3, 'PG-13');
