@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmDBStorage;
-import ru.yandex.practicum.filmorate.storage.LikeDBStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validation.Validator;
 
@@ -25,14 +22,10 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserStorage us;
-    private final LikeDBStorage likeDBStorage;
-    private final FilmDBStorage filmDBStorage;
 
     @Autowired
-    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage us, LikeDBStorage likeDBStorage, FilmDBStorage filmDBStorage) {
+    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage us) {
         this.us = us;
-        this.likeDBStorage = likeDBStorage;
-        this.filmDBStorage = filmDBStorage;
     }
 
     @Override
@@ -76,7 +69,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteFriendById(Long idUser, Long idFriend) {
         us.userDeleteFriend(idUser, idFriend);
-        log.debug("Дружба между User c ID {} и User с ID {} аннулирована.", idUser, idFriend);
+        log.debug("Дружба между User c ID {} и User с ID {} аннулирована.", idUser,idFriend);
     }
 
     @Override
@@ -99,17 +92,4 @@ public class UserServiceImpl implements UserService {
         return ids.stream().map(us::getUserById).map(UserMapper::userToDTO).collect(Collectors.toList());
     }
 
-    @Override
-    public List<Film> findRecommendation(Long idUser) {
-        List<Long> sameUserIds = likeDBStorage.getUsersWithSameLikes(idUser);
-        log.debug("Получаем рекомендации длч пользователя с ID {}", idUser);
-        if (sameUserIds.isEmpty()) return new ArrayList<>();
-        List<Long> recommendations = likeDBStorage.getFilmRecommendationsFrom(idUser, sameUserIds);
-        List<Film> films = new ArrayList<>();
-        for (Long id : recommendations) {
-            films.add(filmDBStorage.getFilmById(id));
-        }
-        log.debug("Рекомендации для пользователя с ID {}:{} ", idUser, films);
-        return films;
-    }
 }

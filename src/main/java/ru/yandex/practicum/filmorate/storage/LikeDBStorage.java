@@ -5,9 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,34 +39,6 @@ public class LikeDBStorage {
         List<Long> likes = jdbcTemplate.query(query, (rs, rowNum) -> rs.getLong("userid"), filmID);
         log.debug("Получен список userid Like у Film с id {}.", filmID);
         return new HashSet<>(likes);
-    }
-
-    public List<Long> getUsersWithSameLikes(Long userId) {
-        final String sqlQuery = "SELECT fl.userid, count(fl.filmid) rate from likes ul" +
-                "    join likes fl  on (ul.filmid = fl.filmid and ul.userid != fl.userid)" +
-                "    join users u  on (fl.userid != u.id)" +
-                " where  ul.userid = ? " +
-                " group by fl.userid " +
-                " having rate > 1 " +
-                " order by rate desc" +
-                " limit 10";
-        List<Long> usersForLike = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("USERID"), userId);
-        log.debug("Получен список userid с похожими лайками: {}.", userId);
-        return usersForLike;
-    }
-
-    public List<Long> getFilmRecommendationsFrom(Long userId, List<Long> sameUserIds) {
-        String inSql = String.join(",", Collections.nCopies(sameUserIds.size(), "?"));
-        final String sqlQuery = "select fl.filmid from likes fl" +
-                " where  fl.userid in (" + inSql + ")" +
-                "    and fl.filmid not in (select ul.filmid from likes ul where ul.userid = ?)";
-        List<Long> idFilmsOfRec = jdbcTemplate.query(sqlQuery, LikeDBStorage::mapRow, sameUserIds.toArray(), userId);
-        log.debug("Список id фильмов для рекомендаций: {}.", idFilmsOfRec);
-        return idFilmsOfRec;
-    }
-
-    private static Long mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return rs.getLong("FILMID");
     }
 
 }
