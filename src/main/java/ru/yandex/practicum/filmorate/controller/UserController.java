@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -79,6 +80,12 @@ public class UserController {
         log.info("Получен DELETE запрос по эндпоинту '/users/{}' на удаление User", userId);
         userService.deleteUser(userId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("{id}/recommendations")
+    public ResponseEntity<List<Film>> findRecommendation(@PathVariable Long id) {
+        log.info("Получен GET запрос по эндпоинту '{id}/recommendations' на получение рекомендации");
+        return new ResponseEntity<>(userService.findRecommendation(id), HttpStatus.OK);
     }
 
 }
