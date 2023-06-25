@@ -68,29 +68,6 @@ public class Validator {
         return true;
     }
 
-    public static boolean reviewValidator(Review review) {
-        if (review.getIsPositive() == null) {
-            throw new ValidationException("Review must have property isPositive");
-        }
-        if (review.getContent() == null) {
-            throw new ValidationException("Review must have property content");
-        }
-        if (review.getUserId() == null) {
-            throw new ValidationException("UserId must not be null");
-        }
-        if (review.getUserId() < 0) {
-            throw new EntityNotFoundException("UserId must have property more then 0");
-        }
-        if (review.getFilmId() == null) {
-            throw new ValidationException("FilmId must not be null");
-        }
-        if (review.getFilmId() < 0) {
-            throw new EntityNotFoundException("FilmId must have property more then 0");
-        }
-        log.debug("review validation is successful");
-        return true;
-    }
-
     public static void validateForGrade(Review review, UserDTO user) {
         if (review == null) {
             throw new EntityNotFoundException("Отзыв не найден");

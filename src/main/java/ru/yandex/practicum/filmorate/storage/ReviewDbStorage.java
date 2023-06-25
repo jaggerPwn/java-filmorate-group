@@ -2,18 +2,14 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.validation.Validator;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -24,33 +20,27 @@ import java.util.List;
 public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final FilmDBStorage fs;
+    private final UserDBStorage us;
+
 
     @Autowired
-    public ReviewDbStorage(JdbcTemplate jdbcTemplate) {
+    public ReviewDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("filmDBStorage") FilmDBStorage fs,
+                           @Qualifier("userDBStorage") UserDBStorage us) {
         this.jdbcTemplate = jdbcTemplate;
+        this.fs = fs;
+        this.us = us;
     }
 
 
     @Override
     public Review saveReview(Review review) {
-        Validator.reviewValidator(review);
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        String sqlInsert = "INSERT INTO PUBLIC.\"REVIEWS\"\n" +
-                "(content, ispositive, userid, filmid)" +
-                "VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(con -> {
-            PreparedStatement statement = con.prepareStatement(sqlInsert, new String[]{"ID"});
-            statement.setString(1, review.getContent());
-            statement.setBoolean(2, review.getIsPositive());
-            statement.setLong(3, review.getUserId());
-            statement.setLong(4, review.getFilmId());
-            return statement;
-        }, keyHolder);
-        try {
-            review.setReviewId(keyHolder.getKey().longValue());
-        } catch (InvalidDataAccessApiUsageException | NullPointerException e) {
-            throw new ValidationException("key not assigned");
-        }
+        fs.getFilmById(review.getFilmId());
+        us.getUserById(review.getUserId());
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("reviews")
+                .usingGeneratedKeyColumns("id");
+        Number key = simpleJdbcInsert.executeAndReturnKey(review.reviewToMap());
+        review.setReviewId((Long) key);
         log.debug("Отзыв на Film c ID {} от User c ID {} создан", review.getFilmId(), review.getUserId());
         return review;
     }
