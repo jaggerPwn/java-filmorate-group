@@ -8,10 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.ReviewService;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -36,6 +40,10 @@ class FilmorateApplicationTests {
     private final MpaDBStorage mpaDBStorage;
     private final UserServiceImpl userServiceImpl;
     private final DirectorDBStorage directorDBStorage;
+    private final FeedDBStorage feedDBStorage;
+    private final UserService userService;
+    private final FilmService filmService;
+
 
     private final ReviewStorage reviewStorage;
     private final ReviewService reviewService;
@@ -855,5 +863,123 @@ class FilmorateApplicationTests {
         directorDBStorage.saveDirector(director2);
         directorDBStorage.deleteDirectorById(1L);
         Assertions.assertEquals(1, directorDBStorage.readAllDirectors().size(), "Ожидался корректный Director");
+    }
+
+    //Создание и проверка одного эвента - друзья, лайки, отзывы. x3 (ADD, UPDATE, REMOVE)
+    //Создание и проверка для одного пользователя - длинна (5).
+    @DisplayName("Тест ленты событий при добавлении и удалении друзей")
+    @Test
+    public void shouldAddFriendEventsToUserFeed() {
+        User user = User.builder()
+                .name("Andrey")
+                .email("ak@aknaz.ru")
+                .login("Aknaz")
+                .birthday(LocalDate.of(1988, 5, 29))
+                .friends(new HashSet<>())
+                .build();
+        User friend = User.builder()
+                .name("Alexey")
+                .email("al@alexey.com")
+                .login("AleXx")
+                .birthday(LocalDate.of(1991, 3, 29))
+                .friends(new HashSet<>())
+                .build();
+
+        long userId = userDBStorage.saveUser(user).getId();
+        long friendId = userDBStorage.saveUser(friend).getId();
+
+        userService.addFiend(userId, friendId);
+        userService.deleteFriendById(userId, friendId);
+        List<Event> userFeed = feedDBStorage.getFeed(userId);
+        Event addFriendEvent = userFeed.get(0);
+        Event removeFriendEvent = userFeed.get(1);
+        Assertions.assertEquals(2, userFeed.size());
+        Assertions.assertEquals(Operation.ADD, addFriendEvent.getOperation());
+        Assertions.assertEquals(EventType.FRIEND, addFriendEvent.getEventType());
+        Assertions.assertEquals(Operation.REMOVE, removeFriendEvent.getOperation());
+        Assertions.assertEquals(EventType.FRIEND, removeFriendEvent.getEventType());
+    }
+
+    @DisplayName("Тест ленты событий при добавлении и удалении лайков")
+    @Test
+    public void shouldAddLikeEventsToUserFeed() {
+        Film film = Film.builder()
+                .name("The Big Lebowski")
+                .description("Cool film")
+                .releaseDate(LocalDate.of(1998, 1, 18))
+                .duration(120)
+                .genres(Set.of(new Genre(1, "Комедия")))
+                .likes(new HashSet<>())
+                .mpa(new Mpa(4, "R"))
+                .build();
+        User user = User.builder()
+                .name("Andrey")
+                .email("ak@aknaz.ru")
+                .login("Aknaz")
+                .birthday(LocalDate.of(1988, 5, 29))
+                .friends(new HashSet<>())
+                .build();
+
+        long filmId = filmDBStorage.saveFilm(film).getId();
+        long userId = userDBStorage.saveUser(user).getId();
+
+        filmService.userLike(filmId, userId);
+        filmService.deleteLikeById(filmId, userId);
+
+        List<Event> userFeed = feedDBStorage.getFeed(userId);
+        Event addLikeEvent = userFeed.get(0);
+        Event removeLikeEvent = userFeed.get(1);
+        Assertions.assertEquals(2, userFeed.size());
+        Assertions.assertEquals(Operation.ADD, addLikeEvent.getOperation());
+        Assertions.assertEquals(EventType.LIKE, addLikeEvent.getEventType());
+        Assertions.assertEquals(Operation.REMOVE, removeLikeEvent.getOperation());
+        Assertions.assertEquals(EventType.LIKE, removeLikeEvent.getEventType());
+    }
+
+    @DisplayName("Тест ленты событий при добавлении, обновлении и удалении отзывов")
+    @Test
+    public void shouldAddReviewEventsToUserFeed() {
+        Film film = Film.builder()
+                .name("The Big Lebowski")
+                .description("Cool film")
+                .releaseDate(LocalDate.of(1998, 1, 18))
+                .duration(120)
+                .genres(Set.of(new Genre(1, "Комедия")))
+                .likes(new HashSet<>())
+                .mpa(new Mpa(4, "R"))
+                .build();
+        User user = User.builder()
+                .name("Andrey")
+                .email("ak@aknaz.ru")
+                .login("Aknaz")
+                .birthday(LocalDate.of(1988, 5, 29))
+                .friends(new HashSet<>())
+                .build();
+        Review review = Review.builder()
+                .content("очень хороший фильм")
+                .userId(1L)
+                .filmId(1L)
+                .isPositive(true)
+                .build();
+        long filmId = filmDBStorage.saveFilm(film).getId();
+        long userId = userDBStorage.saveUser(user).getId();
+        reviewService.addReview(ReviewMapper.reviewToDTO(review));
+        review = reviewStorage.getReviewById(1l);
+        review.setContent("Фильм не очень");
+        review.setIsPositive(false);
+        reviewService.updateReview(ReviewMapper.reviewToDTO(review));
+        reviewService.deleteReviewById(1L);
+
+        List<Event> userFeed = feedDBStorage.getFeed(userId);
+        Event addReviewEvent = userFeed.get(0);
+        Event updateReviewEvent = userFeed.get(1);
+        Event removeReviewEvent = userFeed.get(2);
+        Assertions.assertEquals(3, userFeed.size());
+        Assertions.assertEquals(Operation.ADD, addReviewEvent.getOperation());
+        Assertions.assertEquals(EventType.REVIEW, addReviewEvent.getEventType());
+        Assertions.assertEquals(Operation.UPDATE, updateReviewEvent.getOperation());
+        Assertions.assertEquals(EventType.REVIEW, updateReviewEvent.getEventType());
+        Assertions.assertEquals(Operation.REMOVE, removeReviewEvent.getOperation());
+        Assertions.assertEquals(EventType.REVIEW, removeReviewEvent.getEventType());
     }
 }
