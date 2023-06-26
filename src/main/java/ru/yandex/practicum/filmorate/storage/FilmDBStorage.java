@@ -127,21 +127,6 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public Set<Film> getTopFilms(Long count) {
-        long countFilms;
-        if (count == null) {
-            countFilms = readAllFilms().size();
-        } else {
-            countFilms = count;
-        }
-        String query = "SELECT id, name, description, releaseDate, duration, mpaid FROM films " +
-                "LEFT JOIN likes ON id = filmid GROUP BY id ORDER BY count(userid) desc  LIMIT ?";
-        List<Film> topFilms = jdbcTemplate.query(query, this::mapToFilm, countFilms);
-        log.debug("Получаем топ {} Film по кол-ву Likes.", countFilms);
-        return new HashSet<>(topFilms);
-    }
-
-    @Override
     public List<Film> getSortedFilms(Long id, String sortBy) {
         String sqlQueryLikes = "SELECT f.* "
                 + "FROM films as f "
@@ -244,7 +229,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getCommonFilms(Long userId, Long friendId) { //TODO прогнать тесты в Postman
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
         String query = "SELECT * FROM films f "
                 + "LEFT JOIN likes l1 ON f.id = l1.filmid "
                 + "LEFT JOIN likes l2 ON f.id = l2.filmid "
@@ -255,5 +240,42 @@ public class FilmDBStorage implements FilmStorage {
         List<Film> commonFilms = jdbcTemplate.query(query, this::mapToFilm, userId, friendId);
         log.debug("Получены фильмы общие у Users userId {} и friend id {}.", userId, friendId);
         return commonFilms;
+    }
+
+    @Override
+    public List<Film> getTopFilms(Long count, Long genreId, Long year) {
+
+        // в случае если есть и genreid и year
+        String subquery = "WHERE g.id = " + genreId + " AND EXTRACT (YEAR FROM CAST (f.releasedate AS date)) = " + year + " ";
+
+        // в случае если есть ТОЛЬКО year
+        if ((genreId == null || genreId == 0) && (year != null && year != 0)) {
+            subquery = "WHERE EXTRACT (YEAR FROM CAST (f.releasedate AS date)) = " + year + " ";
+
+            // в случае если есть ТОЛЬКО genreid
+        } else if ((year == null || year == 0) && (genreId != null && genreId != 0)){
+            subquery = "WHERE g.id = " + genreId + " ";
+
+            // в случае если нет НЕТ НИ genreid НИ year
+        } else if ((year == null || year == 0) && (genreId == null || genreId == 0)) {
+            subquery = "";
+        }
+
+        String query =
+                "SELECT f.id, f.name, f.description, f.releaseDate, f.duration, f.mpaid "
+                        + "FROM films f "
+                        + "LEFT JOIN filmgenres fg ON f.id = fg.filmid "
+                        + "LEFT JOIN genres g ON fg.genreid = g.id "
+                        + "LEFT JOIN likes l ON f.id = l.filmid "
+                        +  subquery
+                        + "GROUP BY f.id "
+                        + "ORDER BY COUNT(l.userid) DESC "
+                        + "LIMIT ?";
+
+
+        List<Film> topFilms = jdbcTemplate.query(query, this::mapToFilm, count);
+        log.debug("Получаем топ {} Film по кол-ву Likes.", count);
+        return topFilms;
+
     }
 }

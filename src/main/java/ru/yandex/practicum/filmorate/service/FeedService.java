@@ -9,5 +9,6 @@ import java.util.List;
 public interface FeedService {
 
     List<EventDTO> getFeed(long id);
+
     EventDTO saveFeed(long userId, long timestamp, EventType eventType, Operation operation, long entityId);
 }

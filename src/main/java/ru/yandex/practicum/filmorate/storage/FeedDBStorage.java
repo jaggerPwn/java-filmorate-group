@@ -26,7 +26,8 @@ public class FeedDBStorage implements FeedStorage {
     public List<Event> getFeed(long id) {
         String sql = "SELECT * " +
                 "FROM feed " +
-                "WHERE userid = ?;";
+                "WHERE userid = ?; ";
+        log.debug("Получен список Event для User c ID {}.", id);
         return jdbcTemplate.query(sql, this::mapToEvent, id);
     }
 
@@ -37,6 +38,7 @@ public class FeedDBStorage implements FeedStorage {
 
         Number key = simpleJdbcInsert.executeAndReturnKey(event.eventToMap());
         event.setEventId((long)key);
+        log.debug("Event c ID {} создан.", event.getEventId());
         return event;
     }
 

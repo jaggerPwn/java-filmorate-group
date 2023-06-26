@@ -26,7 +26,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Autowired
     public ReviewDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("filmDBStorage") FilmDBStorage fs,
-                           @Qualifier("userDBStorage") UserDBStorage us) {
+            @Qualifier("userDBStorage") UserDBStorage us) {
         this.jdbcTemplate = jdbcTemplate;
         this.fs = fs;
         this.us = us;
@@ -41,21 +41,21 @@ public class ReviewDbStorage implements ReviewStorage {
                 .usingGeneratedKeyColumns("id");
         Number key = simpleJdbcInsert.executeAndReturnKey(review.reviewToMap());
         review.setReviewId((Long) key);
-        log.debug("Отзыв на Film c ID {} от User c ID {} создан", review.getFilmId(), review.getUserId());
+        log.debug("Review на Film c ID {} от User c ID {} создан", review.getFilmId(), review.getUserId());
         return review;
     }
 
     @Override
     public Review getReviewById(Long id) {
-        String sqlQuery = "SELECT ID, CONTENT, ISPOSITIVE, USERID, FILMID\n" +
-                "FROM PUBLIC.REVIEWS where ID =  ?";
+        String sqlQuery = "SELECT ID, CONTENT, ISPOSITIVE, USERID, FILMID " +
+                "FROM PUBLIC.REVIEWS where ID = ? ";
         Review review;
         try {
             review = jdbcTemplate.queryForObject(sqlQuery, ReviewDbStorage::mapToReview, id);
         } catch (DataAccessException e) {
             throw new EntityNotFoundException("review " + id + " not found");
         }
-        log.debug("Отзыв с ID {} на Film c ID {} от User c ID {} получено",
+        log.debug("Review с ID {} на Film c ID {} от User c ID {} получено",
                 review.getReviewId(), review.getFilmId(), review.getUserId());
         return review;
     }
@@ -64,71 +64,71 @@ public class ReviewDbStorage implements ReviewStorage {
     public List<Review> readAllReviews(Long filmId, Long count) {
         List<Review> reviews;
         if (filmId == null) {
-            String sqlQuery = "SELECT R.ID,\n" +
-                    "r.CONTENT,\n" +
-                    "r.ISPOSITIVE,\n" +
-                    "r.USERID,\n" +
-                    "r.FILMID, \n" +
-                    "COUNT(NULLIF(POSITIVE, false))-COUNT(NULLIF(POSITIVE,true)) useful\n" +
-                    "FROM PUBLIC.REVIEWS r\n" +
-                    "LEFT JOIN REVIEWLIKES rl ON rl.REVIEWID = r.ID\n" +
-                    "GROUP BY R.ID\n" +
-                    "ORDER BY useful desc\n" +
+            String sqlQuery = "SELECT R.ID, " +
+                    "r.CONTENT, " +
+                    "r.ISPOSITIVE, " +
+                    "r.USERID, " +
+                    "r.FILMID, " +
+                    "COUNT(NULLIF(POSITIVE, false))-COUNT(NULLIF(POSITIVE,true)) useful " +
+                    "FROM PUBLIC.REVIEWS r " +
+                    "LEFT JOIN REVIEWLIKES rl ON rl.REVIEWID = r.ID " +
+                    "GROUP BY R.ID " +
+                    "ORDER BY useful desc " +
                     "LIMIT ?;";
             reviews = jdbcTemplate.query(sqlQuery, ReviewDbStorage::mapToReview, count);
         } else {
-            String sqlQuery = "SELECT R.ID,\n" +
-                    "r.CONTENT,\n" +
-                    "r.ISPOSITIVE,\n" +
-                    "r.USERID,\n" +
-                    "r.FILMID, \n" +
-                    "COUNT(NULLIF(POSITIVE, false))-COUNT(NULLIF(POSITIVE,true)) useful\n" +
-                    "FROM PUBLIC.REVIEWS r\n" +
-                    "LEFT JOIN REVIEWLIKES rl ON rl.REVIEWID = r.ID\n" +
-                    "WHERE FILMID = ?\n" +
-                    "GROUP BY R.ID\n" +
-                    "ORDER BY useful desc\n" +
+            String sqlQuery = "SELECT R.ID, " +
+                    "r.CONTENT, " +
+                    "r.ISPOSITIVE, " +
+                    "r.USERID, " +
+                    "r.FILMID,  " +
+                    "COUNT(NULLIF(POSITIVE, false))-COUNT(NULLIF(POSITIVE,true)) useful " +
+                    "FROM PUBLIC.REVIEWS r " +
+                    "LEFT JOIN REVIEWLIKES rl ON rl.REVIEWID = r.ID " +
+                    "WHERE FILMID = ? " +
+                    "GROUP BY R.ID " +
+                    "ORDER BY useful desc " +
                     "LIMIT ?;";
             reviews = jdbcTemplate.query(sqlQuery, ReviewDbStorage::mapToReview, filmId, count);
         }
-        log.debug("Отзывы на Film c ID {} получены.", filmId);
+        log.debug("Review на Film c ID {} получены.", filmId);
         return reviews;
     }
 
     @Override
     public void saveReviewLikesOrDislikes(Long reviewId, Long userId, boolean positive) {
-        String sql = "DELETE FROM REVIEWLIKES WHERE REVIEWID = ? AND USERID = ?";
+        String sql = "DELETE FROM REVIEWLIKES WHERE REVIEWID = ? AND USERID = ? ";
         jdbcTemplate.update(sql, reviewId, userId);
-        sql = "INSERT INTO reviewLikes (REVIEWID, USERID, POSITIVE) VALUES(?, ?, ?)";
+        sql = "INSERT INTO reviewLikes (REVIEWID, USERID, POSITIVE) VALUES(?, ?, ?) ";
         jdbcTemplate.update(sql, reviewId, userId, positive);
-        log.debug("Реакция на отзывы c ID {} от User c ID {} сохранены", reviewId, userId);
+        log.debug("Реакция на Review c ID {} от User c ID {} сохранены", reviewId, userId);
     }
 
     @Override
     public void deleteReviewLikesOrDislikes(Long reviewId, Long userId, boolean positive) {
-        String sql = "DELETE FROM PUBLIC.REVIEWLIKES\n" +
+        String sql = "DELETE FROM PUBLIC.REVIEWLIKES " +
                 "WHERE USERID=? AND REVIEWID=? AND POSITIVE=?";
         jdbcTemplate.update(sql, positive, userId, reviewId);
-        log.debug("Удаление реакции на отзывы c ID {} от User c ID {} успешно выполнено", reviewId, userId);
+        log.debug("Удаление реакции на Review c ID {} от User c ID {} успешно выполнено", reviewId, userId);
     }
 
     @Override
     public Review updateReview(Review review) {
         //Здесь только 2 параметра обновляется, иначе не проходит постмен тесты.
         // Пояснения в посте наставника: https://app.pachca.com/chats?thread_id=1280887
-        String sqlQuery = "UPDATE PUBLIC.REVIEWS \n" +
-                "SET CONTENT = ?, ISPOSITIVE = ? \n" +
+        String sqlQuery = "UPDATE PUBLIC.REVIEWS  " +
+                "SET CONTENT = ?, ISPOSITIVE = ?  " +
                 "WHERE ID = ?";
         jdbcTemplate.update(sqlQuery, review.getContent(), review.getIsPositive(), review.getReviewId());
         Review reviewById = getReviewById(review.getReviewId());
-        log.debug("Отзыв c ID {} обновлен", review.getReviewId());
+        log.debug("Review c ID {} обновлен", review.getReviewId());
         return reviewById;
     }
 
 
     @Override
     public void deleteReviewById(Long id) {
-        String sqlQuery = "DELETE FROM PUBLIC.REVIEWS WHERE ID=?";
+        String sqlQuery = "DELETE FROM PUBLIC.REVIEWS WHERE ID=? ";
         jdbcTemplate.update(sqlQuery, id);
         log.debug("Review c ID {} удалён", id);
     }
