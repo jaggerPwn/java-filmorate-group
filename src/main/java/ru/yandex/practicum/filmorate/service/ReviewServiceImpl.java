@@ -38,7 +38,7 @@ public class ReviewServiceImpl implements ReviewService {
                 Instant.now().toEpochMilli(),
                 EventType.REVIEW, Operation.ADD,
                 review.getReviewId());
-        log.debug("получен запрос на добавление отзыва");
+        log.debug("получен запрос на добавление review");
         return ReviewMapper.reviewToDTO(review);
     }
 
@@ -49,7 +49,7 @@ public class ReviewServiceImpl implements ReviewService {
                 Instant.now().toEpochMilli(),
                 EventType.REVIEW, Operation.UPDATE,
                 review.getReviewId());
-        log.debug("получен запрос на обновление отзыва c ID c {}", reviewDTO.getReviewId());
+        log.debug("получен запрос на обновление review c ID c {}", reviewDTO.getReviewId());
         return ReviewMapper.reviewToDTO(review);
     }
 
@@ -60,7 +60,7 @@ public class ReviewServiceImpl implements ReviewService {
                 Instant.now().toEpochMilli(),
                 EventType.REVIEW, Operation.REMOVE,
                 reviewId);
-        log.debug("получен запрос на удаление отзыва c ID c {}", reviewId);
+        log.debug("получен запрос на удаление review c ID c {}", reviewId);
         rs.deleteReviewById(reviewId);
     }
 
@@ -69,8 +69,10 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = this.rs.getReviewById(reviewId);
         UserDTO user = us.getUserById(userId);
         Validator.validateForGrade(review, user);
-        if (positive) log.debug("Получен запрос на добавление лайка");
-        if (!positive) log.debug("Получен запрос на добавление disлайка");
+        if (positive)
+            log.debug("Получен запрос на добавление Like для review c Id {} от user c ID {}.", reviewId, userId);
+        if (!positive)
+            log.debug("Получен запрос на добавление disLike для review c Id {} от user c ID {}.", reviewId, userId);
         rs.saveReviewLikesOrDislikes(reviewId, userId, positive);
     }
 
@@ -79,20 +81,22 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = this.rs.getReviewById(reviewId);
         UserDTO user = us.getUserById(userId);
         Validator.validateForGrade(review, user);
-        if (positive) log.debug("Получен запрос на удаление лайка");
-        if (!positive) log.debug("Получен запрос на удаление disлайка");
+        if (positive)
+            log.debug("Получен запрос на удаление Like для review c Id {} от user c ID {}.", reviewId, userId);
+        if (!positive)
+            log.debug("Получен запрос на удаление disLike для review c Id {} от user c ID {}.", reviewId, userId);
         rs.deleteReviewLikesOrDislikes(reviewId, userId, positive);
     }
 
     @Override
     public ReviewDTO getReviewById(long reviewId) {
-        log.debug("получен запрос на обновление отзыва c ID c {}", reviewId);
+        log.debug("получен запрос на обновление Review c ID c {}", reviewId);
         return ReviewMapper.reviewToDTO(rs.getReviewById(reviewId));
     }
 
     @Override
     public List<ReviewDTO> getAllReviews(Long filmId, Long count) {
-        log.debug("получен запрос на получение отзыва по фильму ID c {}", filmId);
+        log.debug("получен запрос на получение Review по Film ID c {}", filmId);
         return ReviewMapper.listUsersToListDto(rs.readAllReviews(filmId, count));
     }
 }

@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     public UserServiceImpl(@Qualifier("userDBStorage") UserStorage us, LikeDBStorage likeDBStorage,
-                           FilmDBStorage filmDBStorage, FeedService fs) {
+            FilmDBStorage filmDBStorage, FeedService fs) {
         this.us = us;
         this.fs = fs;
         this.likeDBStorage = likeDBStorage;
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
         for (Long id : ids) {
             friends.add(UserMapper.userToDTO(us.getUserById(id)));
         }
-        log.debug("Список друзей у User c ID {} был получен.", idUser);
+        log.debug("Получен список друзей у User c ID {}.", idUser);
         return friends;
     }
 
@@ -103,23 +103,27 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> readAllCommonFriends(Long idUser1, Long idUser2) {
         Set<Long> ids = new HashSet<>(us.getUserById(idUser1).getFriends());
         ids.retainAll(us.getUserById(idUser2).getFriends());
-        log.debug("Возвращён список общих друзей у User с ID {} и User c ID {}.", idUser1, idUser2);
+        log.debug("Получен список общих друзей у User с ID {} и User c ID {}.", idUser1, idUser2);
         return ids.stream().map(us::getUserById).map(UserMapper::userToDTO).collect(Collectors.toList());
     }
 
     @Override
     public List<Film> findRecommendation(Long idUser) {
         List<Long> sameUserIds = likeDBStorage.getUsersWithSameLikes(idUser);
-        log.debug("Получаем рекомендации длч пользователя с ID {}", idUser);
-        if (sameUserIds.isEmpty()) return new ArrayList<>();
+        if (sameUserIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<Long> recommendations = likeDBStorage.getFilmRecommendationsFrom(idUser, sameUserIds);
+
         List<Film> films = new ArrayList<>();
         for (Long id : recommendations) {
             films.add(filmDBStorage.getFilmById(id));
         }
-        log.debug("Рекомендации для пользователя с ID {}:{} ", idUser, films);
+        log.debug("Получен список Films рекоменованных для User с ID {}", idUser);
         return films;
     }
+
     @Override
     public void deleteUser(Long id) {
         us.deleteUser(id);

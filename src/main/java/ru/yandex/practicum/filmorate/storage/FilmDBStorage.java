@@ -229,7 +229,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getCommonFilms(Long userId, Long friendId) { //TODO прогнать тесты в Postman
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
         String query = "SELECT * FROM films f "
                 + "LEFT JOIN likes l1 ON f.id = l1.filmid "
                 + "LEFT JOIN likes l2 ON f.id = l2.filmid "
@@ -243,7 +243,7 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getTopFilms(Long count, Long genreId, Long year) { //TODO прогнать тесты в Postman
+    public List<Film> getTopFilms(Long count, Long genreId, Long year) {
 
         // в случае если есть и genreid и year
         String subquery = "WHERE g.id = " + genreId + " AND EXTRACT (YEAR FROM CAST (f.releasedate AS date)) = " + year + " ";
