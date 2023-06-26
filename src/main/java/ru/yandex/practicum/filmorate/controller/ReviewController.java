@@ -25,13 +25,13 @@ public class ReviewController {
 
     @PostMapping
     public ResponseEntity<ReviewDTO> addReview(@RequestBody @Valid ReviewDTO reviewDTO) {
-        log.info("Получен POST запрос по эндпоинту '/reviews' на публикацию отзыва");
+        log.info("Получен POST запрос по эндпоинту '/reviews' на публикацию review");
         return new ResponseEntity<>(reviewService.addReview(reviewDTO), HttpStatus.CREATED);
     }
 
     @GetMapping("{reviewId}")
     public ResponseEntity<ReviewDTO> getReviewById(@PathVariable Long reviewId) {
-        log.info("Получен GET запрос по эндпоинту '/reviews/{reviewId}' на получение отзыва с ID {} ", reviewId);
+        log.info("Получен GET запрос по эндпоинту '/reviews/{}' на получение review с ID {} ", reviewId, reviewId);
         return new ResponseEntity<>(reviewService.getReviewById(reviewId), HttpStatus.OK);
     }
 
@@ -39,20 +39,20 @@ public class ReviewController {
     public ResponseEntity<List<ReviewDTO>> getAllReviews(
             @RequestParam(required = false) Long filmId,
             @RequestParam(defaultValue = "10", required = false) Long count) {
-        log.info("Получен GET запрос по эндпоинту '/reviews' на получение REVIEWS в кол-ве {} для FILM c ID {}",
+        log.info("Получен GET запрос по эндпоинту '/reviews' на получение reviews в кол-ве {} для film c ID {}",
                 count, filmId);
         return new ResponseEntity<>(reviewService.getAllReviews(filmId, count), HttpStatus.OK);
     }
 
     @PutMapping
     public ResponseEntity<ReviewDTO> updateReview(@RequestBody @Valid ReviewDTO reviewDTO) {
-        log.info("Получен PUT запрос по эндпоинту '/reviews' на изменение отзывов");
+        log.info("Получен PUT запрос по эндпоинту '/reviews' на изменение review c ID {}.", reviewDTO.getReviewId());
         return new ResponseEntity<>(reviewService.updateReview(reviewDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("{filmId}")
     public void deleteReviewById(@PathVariable Long filmId) {
-        log.info("Получен Delete запрос по эндпоинту '/films/{filmId}' на удаление отзыва по ID фильма {} ", filmId);
+        log.info("Получен Delete запрос по эндпоинту '/films/{}' на удаление review по ID film {} ", filmId, filmId);
         reviewService.deleteReviewById(filmId);
     }
 
@@ -60,8 +60,8 @@ public class ReviewController {
     public void addReviewLike(
             @PathVariable Long reviewId,
             @PathVariable Long userId) {
-        log.info("Получен PUT запрос по эндпоинту '/reviews/{reviewId}/like/{userId}' на лайк отзыва {} юзером {}",
-                reviewId, userId);
+        log.info("Получен PUT запрос по эндпоинту '/reviews/{}/like/{}' на like review c ID {} user c ID {}",
+                reviewId, userId, reviewId, userId);
         reviewService.addReviewLikeOrDislike(reviewId, userId, true);
     }
 
@@ -69,8 +69,8 @@ public class ReviewController {
     public void addReviewDisLike(
             @PathVariable Long reviewId,
             @PathVariable Long userId) {
-        log.info("Получен PUT запрос по эндпоинту '/reviews/{reviewId}/like/{userId}' на disлайк отзыва {} юзером {}",
-                reviewId, userId);
+        log.info("Получен PUT запрос по эндпоинту '/reviews/{}/like/{}' на dislike review c ID {} user c ID {}",
+                reviewId, userId, reviewId, userId);
         reviewService.addReviewLikeOrDislike(reviewId, userId, false);
     }
 
@@ -78,8 +78,8 @@ public class ReviewController {
     public void deleteReviewLike(
             @PathVariable Long reviewId,
             @PathVariable Long userId) {
-        log.info("Получен DELETE запрос по эндпоинту '/reviews/{reviewId}/like/{userId}' на удаление " +
-                "лайка отзыва {} юзером {}", reviewId, userId);
+        log.info("Получен DELETE запрос по эндпоинту '/reviews/{}/like/{}' на удаление " +
+                "like review c ID {} user c ID {}", reviewId, userId, reviewId, userId);
         reviewService.deleteReviewLikeOrDislike(reviewId, userId, true);
     }
 
@@ -87,8 +87,8 @@ public class ReviewController {
     public void deleteReviewDisLike(
             @PathVariable Long reviewId,
             @PathVariable Long userId) {
-        log.info("Получен DELETE запрос по эндпоинту '/reviews/{reviewId}/like/{userId}' на удаление " +
-                "disлайка отзыва {} юзером {}", reviewId, userId);
+        log.info("Получен DELETE запрос по эндпоинту '/reviews/{}/like/{}' на удаление " +
+                "dislike review c ID {} user c ID {}", reviewId, userId, reviewId, userId);
         reviewService.deleteReviewLikeOrDislike(reviewId, userId, false);
     }
 

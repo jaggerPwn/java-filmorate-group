@@ -90,10 +90,11 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<FilmDTO> readTopFilms(Long count) {
+    public List<FilmDTO> getTopFilms(Long count, Long genreId, Long year) {
         log.debug("Получен список из {} Film по кол-ву Likes.", count);
-        return FilmMapper.listFilmsToListDto(fs.getTopFilms(count));
+        return FilmMapper.listFilmsToListDto(fs.getTopFilms(count, genreId,year));
     }
+
 
     @Override
     public List<FilmDTO> getCommonFilms(Long userId, Long friendId) {
@@ -121,7 +122,7 @@ public class FilmServiceImpl implements FilmService {
 
     public List<Film> search(String query, String by) {
         if (query == null && by == null) {
-            return new ArrayList<>(fs.getTopFilms(null));
+            return new ArrayList<>(fs.getTopFilms(null,null,null));
         }
         if (query == null || query.isBlank()) {
             return Collections.emptyList();
