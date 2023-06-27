@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -31,12 +32,16 @@ public class LikeDBStorage {
     }
 
     public void addLike(Long filmId, Long userId) {
-        String query = "DELETE FROM likes WHERE filmId = ? AND userId = ? ";
-        jdbcTemplate.update(query, filmId, userId);
-        query = "INSERT INTO likes (filmid, userid) VALUES(?, ?) ";
-        jdbcTemplate.update(query, filmId, userId);
-        log.debug("Film с ID {} добавлен Like от User с ID {}", filmId, userId);
+        String query = "INSERT INTO likes (filmid, userid) VALUES  (?,?) ";
+        try {
+            jdbcTemplate.update(query, filmId, userId);
+            log.debug("Film с ID {} добавлен Like от пользователя с ID {}", filmId, userId);
+        } catch (DataIntegrityViolationException e) {
+            log.debug("Не удалось добавить Like для Film с ID {} от пользователя с ID {}. "
+                    + "Возможно, запись уже существует.", filmId, userId);
+        }
     }
+
 
     public Set<Long> getLikerByFilmId(Long filmID) {
         String query = "SELECT userid FROM likes WHERE filmid = ?";
