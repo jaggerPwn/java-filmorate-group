@@ -135,7 +135,7 @@ public class ReviewDbStorage implements ReviewStorage {
         log.debug("Review c ID {} удалён", id);
     }
 
-    public static Review mapToReview(ResultSet resultSet, int i) throws SQLException {
+    public static Review mapToReview(ResultSet resultSet, int i) {
         Review build = null;
         try {
             build = Review.builder()
@@ -145,7 +145,7 @@ public class ReviewDbStorage implements ReviewStorage {
                     .userId(resultSet.getLong("userId"))
                     .isPositive(resultSet.getBoolean("isPositive"))
                     .build();
-        } catch (SQLException ignored) {
+        } catch (SQLException sqlException) {
         }
         try {
             build.setUseful(resultSet.getInt("useful"));
