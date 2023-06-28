@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
@@ -98,14 +97,11 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public void saveReviewLikesOrDislikes(Long reviewId, Long userId, boolean positive) {
-        String sql = "INSERT INTO reviewLikes (REVIEWID, USERID, POSITIVE) VALUES(?, ?, ?) ";
-        try {
-            jdbcTemplate.update(sql, reviewId, userId, positive);
-            log.debug("Реакция на Review c ID {} от User c ID {} сохранены", reviewId, userId);
-        } catch (DataIntegrityViolationException e) {
-            log.debug("Не удалось добавить реакцию на Review c ID {} от User c ID {}. Возможно, запись уже существует.",
-                    reviewId, userId);
-        }
+        String sql = "DELETE FROM REVIEWLIKES WHERE REVIEWID = ? AND USERID = ? ";
+        jdbcTemplate.update(sql, reviewId, userId);
+        sql = "INSERT INTO reviewLikes (REVIEWID, USERID, POSITIVE) VALUES(?, ?, ?) ";
+        jdbcTemplate.update(sql, reviewId, userId, positive);
+        log.debug("Реакция на Review c ID {} от User c ID {} сохранены", reviewId, userId);
     }
 
     @Override
@@ -149,7 +145,6 @@ public class ReviewDbStorage implements ReviewStorage {
             build.setUseful(resultSet.getInt("useful"));
         } catch (SQLException ignored) {
         }
-        String qwe = "SELECT * FROM ITEM_MAST WHERE PRO_PRICE BETWEEN 200 AND 600 ";
         return build;
 
     }
