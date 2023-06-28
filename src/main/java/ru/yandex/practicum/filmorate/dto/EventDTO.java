@@ -25,4 +25,3 @@ public class EventDTO {
     @NotNull
     private long entityId;
 }
-
