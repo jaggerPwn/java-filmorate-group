@@ -16,9 +16,4 @@ public class Director {
     private Long id;
     private String name;
 
-    public Map<String, Object> directorToMap() {
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("name", name);
-        return temp;
-    }
 }

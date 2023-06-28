@@ -25,5 +25,4 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    List<Film> findRecommendation(Long idUser);
 }

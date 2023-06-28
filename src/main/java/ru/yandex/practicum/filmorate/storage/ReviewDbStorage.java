@@ -12,7 +12,9 @@ import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -39,7 +41,7 @@ public class ReviewDbStorage implements ReviewStorage {
         us.getUserById(review.getUserId());
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("reviews")
                 .usingGeneratedKeyColumns("id");
-        Number key = simpleJdbcInsert.executeAndReturnKey(review.reviewToMap());
+        Number key = simpleJdbcInsert.executeAndReturnKey(reviewToMap(review));
         review.setReviewId((Long) key);
         log.debug("Review на Film c ID {} от User c ID {} создан", review.getFilmId(), review.getUserId());
         return review;
@@ -146,6 +148,16 @@ public class ReviewDbStorage implements ReviewStorage {
         } catch (SQLException ignored) {
         }
         return build;
-
     }
+
+    public Map<String, ?> reviewToMap(Review review) {
+        Map<String, Object> temp = new HashMap<>();
+        temp.put("id", review.getReviewId());
+        temp.put("content", review.getContent());
+        temp.put("ispositive", review.getIsPositive());
+        temp.put("userid", review.getUserId());
+        temp.put("filmid", review.getFilmId());
+        return temp;
+    }
+
 }

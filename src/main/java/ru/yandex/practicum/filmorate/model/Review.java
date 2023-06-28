@@ -24,13 +24,4 @@ public class Review {
     private Long filmId;
     private int useful;
 
-    public Map<String, ?> reviewToMap() {
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("id", reviewId);
-        temp.put("content", content);
-        temp.put("ispositive", isPositive);
-        temp.put("userid", userId);
-        temp.put("filmid", filmId);
-        return temp;
-    }
 }

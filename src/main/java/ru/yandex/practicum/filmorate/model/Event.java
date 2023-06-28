@@ -23,13 +23,4 @@ public class Event {
     private Operation operation;
     private long entityId;
 
-    public Map<String, Object> eventToMap() {
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("userId", userId);
-        temp.put("timestamp", timestamp);
-        temp.put("eventType", eventType.name());
-        temp.put("operation", operation.name());
-        temp.put("entityId", entityId);
-        return temp;
-    }
 }

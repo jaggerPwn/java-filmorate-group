@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     private final FilmDBStorage filmDBStorage;
 
     @Autowired
-    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage userStorage, LikeDBStorage likeDBStorage,
+    public UserServiceImpl(UserStorage userStorage, LikeDBStorage likeDBStorage,
             FilmDBStorage filmDBStorage, FeedService feedService) {
         this.userStorage = userStorage;
         this.feedService = feedService;
@@ -106,23 +106,23 @@ public class UserServiceImpl implements UserService {
         log.debug("Получен список общих друзей у User с ID {} и User c ID {}.", idUser1, idUser2);
         return ids.stream().map(userStorage::getUserById).map(UserMapper::userToDTO).collect(Collectors.toList());
     }
-
-    @Override
-    public List<Film> findRecommendation(Long idUser) {
-        List<Long> sameUserIds = likeDBStorage.getUsersWithSameLikes(idUser);
-        if (sameUserIds.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        List<Long> recommendations = likeDBStorage.getFilmRecommendationsFrom(idUser, sameUserIds);
-
-        List<Film> films = new ArrayList<>();
-        for (Long id : recommendations) {
-            films.add(filmDBStorage.getFilmById(id));
-        }
-        log.debug("Получен список Films рекоменованных для User с ID {}", idUser);
-        return films;
-    }
+//
+//    @Override
+//    public List<Film> findRecommendation(Long idUser) {
+//        List<Long> sameUserIds = likeDBStorage.getUsersWithSameLikes(idUser);
+//        if (sameUserIds.isEmpty()) {
+//            return new ArrayList<>();
+//        }
+//
+//        List<Long> recommendations = likeDBStorage.getFilmRecommendationsFrom(idUser, sameUserIds);
+//
+//        List<Film> films = new ArrayList<>();
+//        for (Long id : recommendations) {
+//            films.add(filmDBStorage.getFilmById(id));
+//        }
+//        log.debug("Получен список Films рекоменованных для User с ID {}", idUser);
+//        return films;
+//    }
 
     @Override
     public void deleteUser(Long id) {
