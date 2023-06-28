@@ -19,17 +19,17 @@ import java.util.List;
 public class FeedServiceImpl implements FeedService {
 
     private final FeedStorage feedStorage;
-    private final UserStorage us;
+    private final UserStorage userStorage;
 
     @Autowired
-    public FeedServiceImpl(FeedStorage feedStorage, @Qualifier("userDBStorage") UserStorage us) {
+    public FeedServiceImpl(FeedStorage feedStorage, UserStorage userStorage) {
         this.feedStorage = feedStorage;
-        this.us = us;
+        this.userStorage = userStorage;
     }
 
     @Override
     public List<EventDTO> getFeed(long id) {
-        us.getUserById(id); // для валидации
+        userStorage.getUserById(id); // для валидации
         return EventMapper.listEventsToListDto(feedStorage.getFeed(id));
     }
 
