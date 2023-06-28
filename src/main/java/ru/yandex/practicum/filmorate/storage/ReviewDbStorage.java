@@ -148,7 +148,8 @@ public class ReviewDbStorage implements ReviewStorage {
         }
         try {
             build.setUseful(resultSet.getInt("useful"));
-        } catch (SQLException ignored) {
+        } catch (SQLException sqlException) {
+            build.setUseful(0);
         }
         return build;
     }
