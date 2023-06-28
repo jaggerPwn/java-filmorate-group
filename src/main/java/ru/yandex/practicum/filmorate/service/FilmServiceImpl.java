@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.FilmDTO;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
@@ -25,16 +26,16 @@ import java.util.List;
 @Service
 public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
-    private final LikeDBStorage likeDBStorage;
+    private final UserService userService;
+    private final LikeService likeService;
     private final FeedService feedService;
 
     @Autowired
-    public FilmServiceImpl(FilmStorage filmStorage, UserStorage userStorage,
-            LikeDBStorage likeDBStorage, FeedService feedService) {
+    public FilmServiceImpl(FilmStorage filmStorage, UserService userService,
+            LikeService likeService, FeedService feedService) {
         this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-        this.likeDBStorage = likeDBStorage;
+        this.userService = userService;
+        this.likeService = likeService;
         this.feedService = feedService;
     }
 
@@ -73,8 +74,8 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public void deleteLikeById(Long idFilm, Long idUser) {
         filmStorage.getFilmById(idFilm);
-        userStorage.getUserById(idUser); // для валидации
-        likeDBStorage.deleteLike(idFilm, idUser);
+        userService.getUserById(idUser); // для валидации
+        likeService.deleteLike(idFilm, idUser);
         feedService.saveFeed(idUser, Instant.now().toEpochMilli(), EventType.LIKE, Operation.REMOVE, idFilm);
         log.debug("Лайк User c ID {} удалён у Film c ID {}", idUser, idFilm);
     }
@@ -82,8 +83,8 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public void userLike(Long idFilm, Long idUser) {
         filmStorage.getFilmById(idFilm);
-        userStorage.getUserById(idUser); // для валидации
-        likeDBStorage.addLike(idFilm, idUser);
+        userService.getUserById(idUser); // для валидации
+        likeService.addLike(idFilm, idUser);
         feedService.saveFeed(idUser, Instant.now().toEpochMilli(), EventType.LIKE, Operation.ADD, idFilm);
         log.debug("Лайк у User c ID {} установлен Film c ID {}.", idUser, idFilm);
     }

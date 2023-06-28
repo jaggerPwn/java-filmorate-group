@@ -2,17 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.UserDTO;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.model.enums.Operation;
-import ru.yandex.practicum.filmorate.storage.FilmDBStorage;
-import ru.yandex.practicum.filmorate.storage.LikeDBStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validation.Validator;
 
@@ -29,16 +25,11 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
     private final FeedService feedService;
-    private final LikeDBStorage likeDBStorage;
-    private final FilmDBStorage filmDBStorage;
 
     @Autowired
-    public UserServiceImpl(UserStorage userStorage, LikeDBStorage likeDBStorage,
-            FilmDBStorage filmDBStorage, FeedService feedService) {
+    public UserServiceImpl(UserStorage userStorage, FeedService feedService ) {
         this.userStorage = userStorage;
         this.feedService = feedService;
-        this.likeDBStorage = likeDBStorage;
-        this.filmDBStorage = filmDBStorage;
     }
 
     @Override
@@ -106,23 +97,6 @@ public class UserServiceImpl implements UserService {
         log.debug("Получен список общих друзей у User с ID {} и User c ID {}.", idUser1, idUser2);
         return ids.stream().map(userStorage::getUserById).map(UserMapper::userToDTO).collect(Collectors.toList());
     }
-//
-//    @Override
-//    public List<Film> findRecommendation(Long idUser) {
-//        List<Long> sameUserIds = likeDBStorage.getUsersWithSameLikes(idUser);
-//        if (sameUserIds.isEmpty()) {
-//            return new ArrayList<>();
-//        }
-//
-//        List<Long> recommendations = likeDBStorage.getFilmRecommendationsFrom(idUser, sameUserIds);
-//
-//        List<Film> films = new ArrayList<>();
-//        for (Long id : recommendations) {
-//            films.add(filmDBStorage.getFilmById(id));
-//        }
-//        log.debug("Получен список Films рекоменованных для User с ID {}", idUser);
-//        return films;
-//    }
 
     @Override
     public void deleteUser(Long id) {

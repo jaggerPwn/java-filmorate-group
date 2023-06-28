@@ -136,16 +136,21 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     public static Review mapToReview(ResultSet resultSet, int i) throws SQLException {
-        Review build = Review.builder()
-                .reviewId(resultSet.getLong("id"))
-                .content(resultSet.getString("content"))
-                .filmId(resultSet.getLong("filmId"))
-                .userId(resultSet.getLong("userId"))
-                .isPositive(resultSet.getBoolean("isPositive"))
-                .build();
+        Review build = null;
+        try {
+            build = Review.builder()
+                    .reviewId(resultSet.getLong("id"))
+                    .content(resultSet.getString("content"))
+                    .filmId(resultSet.getLong("filmId"))
+                    .userId(resultSet.getLong("userId"))
+                    .isPositive(resultSet.getBoolean("isPositive"))
+                    .build();
+        } catch (SQLException ignored) {
+        }
         try {
             build.setUseful(resultSet.getInt("useful"));
-        } catch (SQLException ignored) {
+        } catch (SQLException sqlException) {
+            build.setUseful(0);
         }
         return build;
     }

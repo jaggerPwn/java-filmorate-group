@@ -14,23 +14,23 @@ import java.util.List;
 @Service
 public class RecommendationServiceImpl implements RecommendationService{
 
-    private final LikeDBStorage likeDBStorage;
+    private final LikeService likeService;
     private final FilmService filmService;
 
     @Autowired
-    public RecommendationServiceImpl(LikeDBStorage likeDBStorage, FilmService filmService) {
-        this.likeDBStorage = likeDBStorage;
+    public RecommendationServiceImpl(LikeDBStorage likeDBStorage, LikeService likeService, FilmService filmService) {
+        this.likeService = likeService;
         this.filmService = filmService;
     }
 
     @Override
     public List<Film> findRecommendation(Long idUser) {
-        List<Long> sameUserIds = likeDBStorage.getUsersWithSameLikes(idUser);
+        List<Long> sameUserIds = likeService.getUsersWithSameLikes(idUser);
         if (sameUserIds.isEmpty()) {
             return new ArrayList<>();
         }
 
-        List<Long> recommendations = likeDBStorage.getFilmRecommendationsFrom(idUser, sameUserIds);
+        List<Long> recommendations = likeService.getFilmRecommendationsFrom(idUser, sameUserIds);
 
         List<Film> films = new ArrayList<>();
         for (Long id : recommendations) {

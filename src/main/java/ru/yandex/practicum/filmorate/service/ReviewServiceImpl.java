@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
-import ru.yandex.practicum.filmorate.validation.Validator;
 
 import java.time.Instant;
 import java.util.List;
@@ -68,7 +67,6 @@ public class ReviewServiceImpl implements ReviewService {
     public void addReviewLikeOrDislike(Long reviewId, Long userId, boolean positive) {
         Review review = this.reviewStorage.getReviewById(reviewId);
         UserDTO user = userService.getUserById(userId);
-        Validator.validateForGrade(review, user);
         if (positive)
             log.debug("Получен запрос на добавление Like для review c Id {} от user c ID {}.", reviewId, userId);
         if (!positive)
@@ -80,7 +78,6 @@ public class ReviewServiceImpl implements ReviewService {
     public void deleteReviewLikeOrDislike(Long reviewId, Long userId, boolean positive) {
         Review review = this.reviewStorage.getReviewById(reviewId);
         UserDTO user = userService.getUserById(userId);
-        Validator.validateForGrade(review, user);
         if (positive)
             log.debug("Получен запрос на удаление Like для review c Id {} от user c ID {}.", reviewId, userId);
         if (!positive)
