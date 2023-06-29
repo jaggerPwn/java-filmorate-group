@@ -68,13 +68,4 @@ public class Validator {
         return true;
     }
 
-    public static void validateForGrade(Review review, UserDTO user) {
-        if (review == null) {
-            throw new EntityNotFoundException("Отзыв не найден");
-        }
-        if (user == null) {
-            throw new EntityNotFoundException("Пользователь не найден");
-        }
-    }
-
 }

@@ -33,14 +33,4 @@ public class Film {
     private Set<Director> directors = new HashSet<>();
     private Mpa mpa;
 
-    public Map<String, Object> filmToMap() {
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("name", name);
-        temp.put("description", description);
-        temp.put("releaseDate", releaseDate);
-        temp.put("duration", duration);
-        temp.put("mpaid", mpa.getId());
-        return temp;
-    }
-
 }

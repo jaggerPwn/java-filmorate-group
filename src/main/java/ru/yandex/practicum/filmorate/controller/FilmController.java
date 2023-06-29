@@ -24,13 +24,13 @@ public class FilmController {
 
     @PostMapping
     public ResponseEntity<FilmDTO> createFilm(@RequestBody @Valid FilmDTO newFilm) {
-        log.info("Получен POST запрос по эндпоинту '/films' на создание Film");
+        log.info("Получен POST запрос по эндпоинту '/films' на создание Film {}.", newFilm.getName());
         return new ResponseEntity<>(service.saveFilm(newFilm), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<FilmDTO> updateFilm(@RequestBody @Valid FilmDTO newFilm) {
-        log.info("Получен PUT запрос по эндпоинту '/films' на обновление Film");
+        log.info("Получен PUT запрос по эндпоинту '/films' на обновление Film c ID {}.", newFilm.getId());
         return new ResponseEntity<>(service.updateFilm(newFilm), HttpStatus.OK);
     }
 
@@ -70,13 +70,14 @@ public class FilmController {
 
     @GetMapping("{filmId}")
     public ResponseEntity<FilmDTO> getFilmById(@PathVariable Long filmId) {
-        log.info("Получен GET запрос по эндпоинту '/films/{}' на получение Film по ID", filmId);
+        log.info("Получен GET запрос по эндпоинту '/films/{}' на получение Film по ID {}.", filmId, filmId);
         return new ResponseEntity<>(service.getFilmByID(filmId), HttpStatus.OK);
     }
 
     @GetMapping("/common")
     public ResponseEntity<List<FilmDTO>> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
-        log.info("Получен GET запрос по эндпоинту '/films/common' на получение общих Film у двух Users");
+        log.info("Получен GET запрос по эндпоинту '/films/common' на получение общих Film у двух Users c ID {} и {}.",
+                userId, friendId);
         return new ResponseEntity<>(service.getCommonFilms(userId, friendId), HttpStatus.OK);
     }
 
