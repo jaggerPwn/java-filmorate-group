@@ -15,11 +15,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
-
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Component("filmDBStorage")
@@ -33,7 +30,7 @@ public class FilmDBStorage implements FilmStorage {
 
     @Autowired
     public FilmDBStorage(JdbcTemplate jdbcTemplate, MpaDBStorage mpaDBStorage, GenreStorage genreStorage,
-                         LikeDBStorage likeDBStorage, DirectorStorage directorStorage) {
+            LikeDBStorage likeDBStorage, DirectorStorage directorStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.mpaDBStorage = mpaDBStorage;
         this.genreStorage = genreStorage;
@@ -253,7 +250,7 @@ public class FilmDBStorage implements FilmStorage {
             subquery = "WHERE EXTRACT (YEAR FROM CAST (f.releasedate AS date)) = " + year + " ";
 
             // в случае если есть ТОЛЬКО genreid
-        } else if ((year == null || year == 0) && (genreId != null && genreId != 0)){
+        } else if ((year == null || year == 0) && (genreId != null && genreId != 0)) {
             subquery = "WHERE g.id = " + genreId + " ";
 
             // в случае если нет НЕТ НИ genreid НИ year
@@ -267,7 +264,7 @@ public class FilmDBStorage implements FilmStorage {
                         + "LEFT JOIN filmgenres fg ON f.id = fg.filmid "
                         + "LEFT JOIN genres g ON fg.genreid = g.id "
                         + "LEFT JOIN likes l ON f.id = l.filmid "
-                        +  subquery
+                        + subquery
                         + "GROUP BY f.id "
                         + "ORDER BY COUNT(l.userid) DESC "
                         + "LIMIT ?";
